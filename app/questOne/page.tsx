@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import QuestionCard from "@/component/qCard";
 import ProgressBar from "@/component/pBar";
@@ -17,24 +17,108 @@ export default function QuestOne() {
     danaDarurat: "",
   });
 
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Refs untuk auto-scroll ke setiap kontainer pertanyaan
+  const q2Ref = useRef<HTMLDivElement>(null);
+  const q3Ref = useRef<HTMLDivElement>(null);
+  const q4Ref = useRef<HTMLDivElement>(null);
+  const q5Ref = useRef<HTMLDivElement>(null);
+  const nextBtnRef = useRef<HTMLDivElement>(null);
+
+  // Efek pendeteksi Reload vs Navigasi Biasa (Back/Forward)
+  useEffect(() => {
+    try {
+      const navigationEntries = performance.getEntriesByType("navigation");
+      const isReload =
+        navigationEntries.length > 0 &&
+        (navigationEntries[0] as PerformanceNavigationTiming).type === "reload";
+
+      if (isReload) {
+        // Jika di-refresh (hard reload), hapus cache kuesioner lama
+        localStorage.removeItem("finesht_health");
+      } else {
+        // Jika navigasi biasa (seperti klik back), pulihkan jawaban sebelumnya
+        const saved = localStorage.getItem("finesht_health");
+        if (saved) {
+          setAnswers(JSON.parse(saved));
+        }
+      }
+    } catch (e) {
+      console.error("Gagal mendeteksi reload atau memulihkan data", e);
+    }
+    setIsLoaded(true);
+  }, []);
+
   function handleChange(key: keyof typeof answers, val: string) {
-    setAnswers((prev) => ({ ...prev, [key]: val }));
+    setAnswers((prev) => {
+      const updated = { ...prev, [key]: val };
+      // Simpan langsung ke localStorage agar ketika user klik "back" data aman terjaga
+      localStorage.setItem("finesht_health", JSON.stringify(updated));
+      return updated;
+    });
   }
 
-  // Hitung progress — berapa pertanyaan yang udah diisi
-  const filled = Object.values(answers).filter((v) => v !== "" && v !== "0").length;
+  // Efek auto-scroll setelah user mengisi pertanyaan
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (answers.income !== "" && answers.pengeluaran === "") {
+      const timer = setTimeout(() => {
+        q2Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 180);
+      return () => clearTimeout(timer);
+    }
+  }, [answers.income, isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (answers.pengeluaran !== "" && answers.cicilan === "") {
+      const timer = setTimeout(() => {
+        q3Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 180);
+      return () => clearTimeout(timer);
+    }
+  }, [answers.pengeluaran, isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (answers.cicilan !== "" && answers.tabungan === "") {
+      const timer = setTimeout(() => {
+        q4Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 180);
+      return () => clearTimeout(timer);
+    }
+  }, [answers.cicilan, isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (answers.tabungan !== "" && answers.danaDarurat === "") {
+      const timer = setTimeout(() => {
+        q5Ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 180);
+      return () => clearTimeout(timer);
+    }
+  }, [answers.tabungan, isLoaded]);
+
+  // useEffect(() => {
+  //   if (!isLoaded) return;
+  //   if (answers.danaDarurat !== "") {
+  //     nextBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  //   }
+  // }, [answers.danaDarurat, isLoaded]);
+
+  const filled = Object.values(answers).filter((v) => v !== "").length;
   const total = Object.keys(answers).length;
-
-  function handleNext() {
-    // Simpan ke localStorage buat diambil di page hasil
-    localStorage.setItem("finesht_health", JSON.stringify(answers));
-    router.push("/hasil");
-  }
-
   const isComplete = filled === total;
 
+  function handleNext() {
+    localStorage.setItem("finesht_health", JSON.stringify(answers));
+    router.push("/questAhp");
+  }
+
   return (
-    <main className="min-h-screen bg-black relative overflow-hidden">
+    <main className="min-h-screen bg-black relative overflow-hidden pb-40">
+      {/* Top Ambient Glow */}
       <div
         className="absolute top-0 left-0 w-full h-[400px] opacity-45 pointer-events-none"
         style={{
@@ -58,7 +142,7 @@ export default function QuestOne() {
 
       <section className="flex justify-center flex-col">
         {/* Header */}
-        <div className="flex flex-col items-center mt-10">
+        <div className="flex flex-col items-center mt-10 text-center px-4">
           <h2 className="font-poppins font-semibold text-xl text-white">
             <em>In this economy</em>&nbsp;seberapa&nbsp;
             <span className="text-[#82E2B3] underline">survive</span>&nbsp;
@@ -69,75 +153,118 @@ export default function QuestOne() {
           </p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="max-w-lg mx-auto w-full px-6 mt-8">
-          <ProgressBar mode="step" current={filled} total={total} />
-        </div>
+        {/* Questions Area */}
+        <div className="max-w-xl mx-auto w-full mt-7 space-y-5 px-6">
 
-        {/* Questions */}
-        <div className="max-w-lg mx-auto w-full px-6">
-
-          <div className="my-6">
+          {/* Pertanyaan 1 */}
+          <div className="transition-all duration-500 opacity-100 transform translate-y-0">
             <QuestionCard
               type="chip-input"
               question="Berapa penghasilan bulananmu?"
               options={["3 Jt", "5 Jt", "7 Jt", "10 Jt", "15 Jt"]}
+              value={answers.income}
               onValueChange={(val) => handleChange("income", val)}
             />
           </div>
 
-          <div className="my-6">
-            <QuestionCard
-              type="chip-input"
-              question="Berapa total pengeluaran rutinmu dalam sebulan?"
-              options={["1 Jt", "2 Jt", "3 Jt", "5 Jt", "7 Jt"]}
-              onValueChange={(val) => handleChange("pengeluaran", val)}
-            />
-          </div>
-
-          <div className="my-6">
-            <QuestionCard
-              type="chip-input"
-              question="Berapa total cicilan yang kamu bayar tiap bulan?"
-              options={["Tidak ada", "500 Rb", "1 Jt", "2 Jt", "3 Jt"]}
-              onValueChange={(val) => handleChange("cicilan", val)}
-            />
-          </div>
-
-          <div className="my-6">
-            <QuestionCard
-              type="chip-input"
-              question="Berapa yang kamu sisihkan untuk ditabung tiap bulan?"
-              options={["100 Rb", "300 Rb", "500 Rb", "1 Jt", "2 Jt"]}
-              onValueChange={(val) => handleChange("tabungan", val)}
-            />
-          </div>
-
-          <div className="my-6">
-            <QuestionCard
-              type="input"
-              question="Berapa total dana darurat / tabungan kas yang kamu punya sekarang?"
-              onValueChange={(val) => handleChange("danaDarurat", val)}
-            />
-          </div>
-
-          {/* Next Button */}
-          <div className="flex justify-end mb-16">
-            <button
-              onClick={handleNext}
-              disabled={!isComplete}
-              className={`flex items-center gap-2 border px-6 py-2.5 rounded-full font-outfit text-sm transition-all duration-200
-                ${isComplete
-                  ? "border-white text-white hover:bg-white/10 cursor-pointer"
-                  : "border-white/20 text-white/30 cursor-not-allowed"
-                }`}
+          {/* Pertanyaan 2 */}
+          {answers.income !== "" && (
+            <div 
+              ref={q2Ref} 
+              className="transition-all duration-700 ease-out opacity-100 transform translate-y-0"
             >
-              next →
-            </button>
-          </div>
+              <QuestionCard
+                type="chip-input"
+                question="Berapa total pengeluaran rutinmu dalam sebulan?"
+                options={["1 Jt", "2 Jt", "3 Jt", "5 Jt", "7 Jt"]}
+                value={answers.pengeluaran}
+                onValueChange={(val) => handleChange("pengeluaran", val)}
+              />
+            </div>
+          )}
+
+          {/* Pertanyaan 3 */}
+          {answers.pengeluaran !== "" && (
+            <div 
+              ref={q3Ref} 
+              className="transition-all duration-700 ease-out opacity-100 transform translate-y-0"
+            >
+              <QuestionCard
+                type="chip-input"
+                question="Berapa total cicilan yang kamu bayar tiap bulan?"
+                options={["Tidak ada", "500 Rb", "1 Jt", "2 Jt", "3 Jt"]}
+                value={answers.cicilan}
+                onValueChange={(val) => handleChange("cicilan", val)}
+              />
+            </div>
+          )}
+
+          {/* Pertanyaan 4 */}
+          {answers.cicilan !== "" && (
+            <div 
+              ref={q4Ref} 
+              className="transition-all duration-700 ease-out opacity-100 transform translate-y-0"
+            >
+              <QuestionCard
+                type="chip-input"
+                question="Berapa yang kamu sisihkan untuk ditabung tiap bulan?"
+                options={["100 Rb", "300 Rb", "500 Rb", "1 Jt", "2 Jt"]}
+                value={answers.tabungan}
+                onValueChange={(val) => handleChange("tabungan", val)}
+              />
+            </div>
+          )}
+
+          {/* Pertanyaan 5 */}
+          {answers.tabungan !== "" && (
+            <div 
+              ref={q5Ref} 
+              className="transition-all duration-700 ease-out opacity-100 transform translate-y-0 mb-[-80]"
+            >
+              <QuestionCard
+                type="input"
+                question="Berapa total dana darurat / tabungan kas yang kamu punya sekarang?"
+                value={answers.danaDarurat}
+                onValueChange={(val) => handleChange("danaDarurat", val)}
+              />
+            </div>
+          )}
 
         </div>
       </section>
+
+      {/* STICKY BOTTOM CAPSULE FLOATING STEPPER / BUTTON NEXT */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-40 px-3">
+        <div
+          className={`backdrop-blur-xl rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] flex items-center justify-center transition-all duration-300 ease-out h-7 border
+            ${isComplete
+              ? "bg-transparent border-[#82E2B3] hover:shadow-[0_0_15px_rgba(130,226,179,0.25)] hover:scale-[1.03] active:scale-[0.98]"
+              : "bg-black/40 border-white/10"
+            }`}
+        >
+          {!isComplete ? (
+            <div className="flex gap-1.5 items-center justify-center w-full px-4">
+              {[...Array(total)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${
+                    i < filled
+                      ? "bg-[#82E2B3] w-6 shadow-[0_0_6px_rgba(255,255,255,0.3)]"
+                      : "bg-white/15 w-4"
+                  }`}
+                />
+              ))}
+            </div>
+          ) : (
+            <button
+              onClick={handleNext}
+              className="w-full h-full flex items-center justify-center text-[#82E2B3] hover:text-[#82E2B3] font-poppins text-xs font-medium tracking-wider transition-colors duration-200 cursor-pointer"
+            >
+              next →
+            </button>
+          )}
+        </div>
+      </div>
     </main>
   );
 }

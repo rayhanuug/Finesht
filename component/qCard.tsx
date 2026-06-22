@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Props = {
   question: string;
   type: "input" | "radio" | "chip" | "chip-input" | "scale";
   options?: string[];
-  onValueChange?: (val: string) => void; // ← tambah ini
+  value: string;
+  onValueChange: (val: string) => void; 
 };
 
 function convertToAngka(opt: string): string {
@@ -38,12 +39,13 @@ function ChipOptions({
   onSelect: (opt: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2 mb-5">
+    <div className="flex flex-wrap gap-3 mb-3">
       {options.map((opt) => (
         <button
           key={opt}
+          type="button"
           onClick={() => onSelect(opt)}
-          className={`px-4 py-1.5 rounded-xl border text-xs font-poppins transition-all duration-200
+          className={`px-4 py-1.5 mt-2 rounded-xl border text-xs font-poppins transition-all duration-200
             ${selected === opt
               ? "bg-white text-black border-white"
               : "bg-transparent text-white/70 border-white/30 hover:border-white/70 hover:text-white"
@@ -58,31 +60,29 @@ function ChipOptions({
 
 function RadioOptions({
   options,
+  value,
   onValueChange,
 }: {
   options: string[];
-  onValueChange?: (val: string) => void;
+  value: string;
+  onValueChange: (val: string) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
   return (
     <div className="flex flex-col gap-3 mt-1">
       {options.map((opt) => (
         <label
           key={opt}
-          onClick={() => {
-            setSelected(opt);
-            onValueChange?.(opt);
-          }}
+          onClick={() => onValueChange(opt)}
           className="flex items-center gap-3 cursor-pointer group"
         >
           <div
             className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 transition-all duration-200
-              ${selected === opt
+              ${value === opt
                 ? "border-white"
                 : "border-white/40 group-hover:border-white/70"
               }`}
           >
-            {selected === opt && (
+            {value === opt && (
               <div className="w-2 h-2 rounded-full bg-white" />
             )}
           </div>
@@ -119,23 +119,22 @@ function InputRp({
 
 function ScaleOptions({
   options,
+  value,
   onValueChange,
 }: {
   options: string[];
-  onValueChange?: (val: string) => void;
+  value: string;
+  onValueChange: (val: string) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
   return (
     <div className="flex gap-2">
       {options.map((opt) => (
         <button
           key={opt}
-          onClick={() => {
-            setSelected(opt);
-            onValueChange?.(opt);
-          }}
+          type="button"
+          onClick={() => onValueChange(opt)}
           className={`flex-1 py-2 rounded-xl border text-xs font-poppins transition-all duration-200
-            ${selected === opt
+            ${value === opt
               ? "bg-white text-black border-white"
               : "bg-transparent text-white/70 border-white/30 hover:border-white/70 hover:text-white"
             }`}
@@ -149,72 +148,93 @@ function ScaleOptions({
 
 function ChipWithInput({
   options,
+  value,
   onValueChange,
 }: {
   options: string[];
-  onValueChange?: (val: string) => void;
+  value: string;
+  onValueChange: (val: string) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState("");
+  const [selectedChip, setSelectedChip] = useState<string | null>(null);
+
+  useEffect(() => {
+    const foundChip = options.find(opt => convertToAngka(opt) === value);
+    if (foundChip) {
+      setSelectedChip(foundChip);
+    } else {
+      setSelectedChip(null);
+    }
+  }, [value, options]);
 
   function handleChipSelect(opt: string) {
-    setSelected(opt);
+    setSelectedChip(opt);
     const angka = convertToAngka(opt);
-    setInputValue(angka);
-    onValueChange?.(angka); // ← kirim ke parent saat chip dipilih
-  }
-
-  function handleInputChange(val: string) {
-    setInputValue(val);
-    onValueChange?.(val); // ← kirim ke parent saat input manual
+    onValueChange(angka);
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <ChipOptions options={options} selected={selected} onSelect={handleChipSelect} />
-      <InputRp value={inputValue} onChange={handleInputChange} />
+      <ChipOptions options={options} selected={selectedChip} onSelect={handleChipSelect} />
+      <InputRp value={value} onChange={onValueChange} />
     </div>
   );
 }
 
-function StandaloneInput({
-  onValueChange,
-}: {
-  onValueChange?: (val: string) => void;
-}) {
-  const [inputValue, setInputValue] = useState("");
-
-  function handleChange(val: string) {
-    setInputValue(val);
-    onValueChange?.(val); // ← kirim ke parent
-  }
-
-  return <InputRp value={inputValue} onChange={handleChange} />;
-}
-
-export default function QuestionCard({ question, type, options = [], onValueChange }: Props) {
+// MAIN REUSABLE QUESTION CARD EXPORT
+export default function QuestionCard({ question, type, options = [], value, onValueChange }: Props) {
   return (
     <div
-      className="rounded-2xl border border-white/20 p-5 flex flex-col gap-4 w-full"
+      className="rounded-2xl border border-white/20 p-5 pb-6 flex flex-col gap-4 w-full transition-all duration-300 hover:border-white/40"
       style={{
         background: "rgba(4, 4, 4, 0.20)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
       }}
     >
-      {/* Question */}
-      <p className="text-white font-poppins font-medium text-sm leading-relaxed">
+      {/* Pertanyaan */}
+      <p className="text-white font-poppins font-regular text-md leading-relaxed">
         {question}
       </p>
 
-      {/* Content */}
+      {/* Render Opsi Berdasarkan Tipe */}
       {type === "chip" && (
-        <ChipOptions options={options} selected={null} onSelect={(val) => onValueChange?.(val)} />
+        <ChipOptions 
+          options={options} 
+          selected={value} 
+          onSelect={(val) => onValueChange(val)} 
+        />
       )}
-      {type === "chip-input" && <ChipWithInput options={options} onValueChange={onValueChange} />}
-      {type === "radio" && <RadioOptions options={options} onValueChange={onValueChange} />}
-      {type === "input" && <StandaloneInput onValueChange={onValueChange} />}
-      {type === "scale" && <ScaleOptions options={options} onValueChange={onValueChange} />}
+      
+      {type === "chip-input" && (
+        <ChipWithInput 
+          options={options} 
+          value={value} 
+          onValueChange={onValueChange} 
+        />
+      )}
+      
+      {type === "radio" && (
+        <RadioOptions 
+          options={options} 
+          value={value} 
+          onValueChange={onValueChange} 
+        />
+      )}
+      
+      {type === "input" && (
+        <InputRp 
+          value={value} 
+          onChange={onValueChange} 
+        />
+      )}
+      
+      {type === "scale" && (
+        <ScaleOptions 
+          options={options} 
+          value={value} 
+          onValueChange={onValueChange} 
+        />
+      )}
     </div>
   );
 }
