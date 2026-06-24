@@ -5,25 +5,31 @@ type Props = {
 };
 
 export default function ActionItem({ number, title, description }: Props) {
+
+  const isFirst= number === 1;
+
   return (
     <div
-      className="flex items-start gap-4 p-4 rounded-xl"
-      style={{ background: "#0B0B0B" }}
+      className="flex items-start gap-4 py-2 rounded-xl"
     >
-      {/* Nomor */}
+      {}
       <span
-        className="font-poppins font-bold text-5xl leading-none flex-shrink-0"
-        style={{ color: "#82E2AE" }}
+        // className="font-poppins font-regular text-transparent [-webkit-text-stroke:0.3px_#82E2AE] text-7xl shrink-0 w-10 inline-block text-left"
+        className={`font-poppins font-regular text-5xl shrink-0 w-7 inline-block text-left transition-all duration-300 transform ${
+          isFirst
+            ? "text-transparent [-webkit-text-stroke:0.8px_rgba(130,226,174,0.5)] translate-x-1.5"
+            : "text-transparent [-webkit-text-stroke:0.8px_rgba(130,226,174,0.5)]"
+        }`}
       >
         {number}
       </span>
 
-      {/* Konten */}
+      {}
       <div className="flex flex-col gap-1 pt-1">
-        <span className="text-white font-poppins font-semibold text-sm">
+        <span className="text-white font-poppins font-medium text-[10px]">
           {title}
         </span>
-        <span className="text-white/50 font-poppins font-light text-xs leading-relaxed">
+        <span className="text-white/50 font-poppins font-light text-[10px]">
           {description}
         </span>
       </div>

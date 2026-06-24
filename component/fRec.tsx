@@ -23,22 +23,21 @@ export default function PlanningPanel({ priority, description, actions }: Props)
     >
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <span className="text-white/50 font-poppins text-xs">
+        <span className="text-white font-poppins font-light text-xs">
           Prioritas Utama
         </span>
-        <h3 className="text-white font-poppins font-bold text-lg leading-tight">
+        <h3 className="text-white font-poppins font-semibold">
           {priority}
         </h3>
-        <p className="text-white/60 font-poppins font-light text-xs leading-relaxed">
+        <p className="text-white/80 mt-2 font-poppins font-light text-xs leading-relaxed">
           {description}
         </p>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-white/10" />
+      <p className="text-white font-poppins font-medium text-md mt-5">Smart planning</p>
 
       {/* Action Items */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-5">
         {actions.map((action, index) => (
           <ActionItem
             key={index}
