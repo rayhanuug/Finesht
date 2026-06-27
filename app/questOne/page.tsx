@@ -19,14 +19,12 @@ export default function QuestOne() {
 
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Refs untuk auto-scroll ke setiap kontainer pertanyaan
   const q2Ref = useRef<HTMLDivElement>(null);
   const q3Ref = useRef<HTMLDivElement>(null);
   const q4Ref = useRef<HTMLDivElement>(null);
   const q5Ref = useRef<HTMLDivElement>(null);
   const nextBtnRef = useRef<HTMLDivElement>(null);
 
-  // Efek pendeteksi Reload vs Navigasi Biasa (Back/Forward)
   useEffect(() => {
     try {
       const navigationEntries = performance.getEntriesByType("navigation");
@@ -35,10 +33,8 @@ export default function QuestOne() {
         (navigationEntries[0] as PerformanceNavigationTiming).type === "reload";
 
       if (isReload) {
-        // Jika di-refresh (hard reload), hapus cache kuesioner lama
         localStorage.removeItem("finesht_health");
       } else {
-        // Jika navigasi biasa (seperti klik back), pulihkan jawaban sebelumnya
         const saved = localStorage.getItem("finesht_health");
         if (saved) {
           setAnswers(JSON.parse(saved));
@@ -53,13 +49,11 @@ export default function QuestOne() {
   function handleChange(key: keyof typeof answers, val: string) {
     setAnswers((prev) => {
       const updated = { ...prev, [key]: val };
-      // Simpan langsung ke localStorage agar ketika user klik "back" data aman terjaga
       localStorage.setItem("finesht_health", JSON.stringify(updated));
       return updated;
     });
   }
 
-  // Efek auto-scroll setelah user mengisi pertanyaan
   useEffect(() => {
     if (!isLoaded) return;
     if (answers.income !== "" && answers.pengeluaran === "") {
@@ -100,13 +94,6 @@ export default function QuestOne() {
     }
   }, [answers.tabungan, isLoaded]);
 
-  // useEffect(() => {
-  //   if (!isLoaded) return;
-  //   if (answers.danaDarurat !== "") {
-  //     nextBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-  //   }
-  // }, [answers.danaDarurat, isLoaded]);
-
   const filled = Object.values(answers).filter((v) => v !== "").length;
   const total = Object.keys(answers).length;
   const isComplete = filled === total;
@@ -118,7 +105,6 @@ export default function QuestOne() {
 
   return (
     <main className="min-h-screen bg-black relative overflow-hidden pb-40">
-      {/* Top Ambient Glow */}
       <div
         className="absolute top-0 left-0 w-full h-[400px] opacity-45 pointer-events-none"
         style={{

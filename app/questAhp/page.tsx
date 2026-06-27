@@ -3,35 +3,27 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import QuestionCard from "@/component/qCard";
-import ProgressBar from "@/component/pBar";
-import {
-  PAIRWISE_PAIRS,
-  KRITERIA_LABEL,
-  SAATY_MAP,
-  Kriteria,
-} from "@/lib/ahpLogic";
-
-const AHP_OPTIONS = [
-  "A jauh lebih penting",
-  "A lebih penting",
-  "Keduanya sama penting",
-  "B lebih penting",
-  "B jauh lebih penting",
-];
+import AHPScaleCard from "@/component/ahpQCard";
+import { KRITERIA_LABEL } from "@/lib/ahpLogic";
+import { AHP_QUESTIONS } from "@/lib/ahpQuest";
 
 export default function QuestAhp() {
   const router = useRouter();
 
-  const [answers, setAnswers] = useState<Record<number, string>>(
-    Object.fromEntries(PAIRWISE_PAIRS.map((_, i) => [i, ""]))
+  // Default semua tengah (nilai 1 = Sama Penting)
+  const [answers, setAnswers] = useState<Record<number, number>>(
+    Object.fromEntries(AHP_QUESTIONS.map((_, i) => [i, 1]))
+  );
+
+  // Track pertanyaan yang udah disentuh user
+  const [touched, setTouched] = useState<Record<number, boolean>>(
+    Object.fromEntries(AHP_QUESTIONS.map((_, i) => [i, false]))
   );
 
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Refs untuk auto-scroll
   const questionRefs = useRef<(HTMLDivElement | null)[]>(
-    Array(PAIRWISE_PAIRS.length).fill(null)
+    Array(AHP_QUESTIONS.length).fill(null)
   );
 
   useEffect(() => {
@@ -43,11 +35,12 @@ export default function QuestAhp() {
 
       if (isReload) {
         localStorage.removeItem("finesht_ahp");
+        localStorage.removeItem("finesht_ahp_touched");
       } else {
         const saved = localStorage.getItem("finesht_ahp");
-        if (saved) {
-          setAnswers(JSON.parse(saved));
-        }
+        const savedTouched = localStorage.getItem("finesht_ahp_touched");
+        if (saved) setAnswers(JSON.parse(saved));
+        if (savedTouched) setTouched(JSON.parse(savedTouched));
       }
     } catch (e) {
       console.error("Gagal mendeteksi reload atau memulihkan data", e);
@@ -55,10 +48,16 @@ export default function QuestAhp() {
     setIsLoaded(true);
   }, []);
 
-  function handleChange(index: number, val: string) {
+  function handleChange(index: number, nilai: number) {
     setAnswers((prev) => {
-      const updated = { ...prev, [index]: val };
+      const updated = { ...prev, [index]: nilai };
       localStorage.setItem("finesht_ahp", JSON.stringify(updated));
+      return updated;
+    });
+
+    setTouched((prev) => {
+      const updated = { ...prev, [index]: true };
+      localStorage.setItem("finesht_ahp_touched", JSON.stringify(updated));
       return updated;
     });
 
@@ -68,34 +67,27 @@ export default function QuestAhp() {
       if (nextRef) {
         nextRef.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-    }, 180);
+    }, 300);
   }
 
-  const filled = Object.values(answers).filter((v) => v !== "").length;
-  const total = PAIRWISE_PAIRS.length;
+  const filled = Object.values(touched).filter((v) => v === true).length;
+  const total = AHP_QUESTIONS.length;
   const isComplete = filled === total;
+  const visibleCount = Math.min(filled + 1, total);
 
   function handleNext() {
-    // Convert jawaban teks ke nilai numerik Saaty
-    const ahpAnswers = PAIRWISE_PAIRS.map((pair, i) => ({
-      kriteria_a: pair.a,
-      kriteria_b: pair.b,
-      nilai: SAATY_MAP[answers[i]] ?? 1,
+    const ahpAnswers = AHP_QUESTIONS.map((q, i) => ({
+      kriteria_a: q.pair.a,
+      kriteria_b: q.pair.b,
+      nilai: answers[i],
     }));
 
     localStorage.setItem("finesht_ahp_answers", JSON.stringify(ahpAnswers));
     router.push("/hasil");
   }
 
-  // Generate pertanyaan yang ditampilin — hanya sampai pertanyaan pertama yang belum dijawab + 1
-  const visibleCount = Math.min(
-    filled + 1,
-    total
-  );
-
   return (
     <main className="min-h-screen bg-black relative overflow-hidden pb-40">
-      {/* Gradient */}
       <div
         className="absolute top-0 left-0 w-full h-[400px] opacity-45 pointer-events-none"
         style={{
@@ -108,7 +100,7 @@ export default function QuestAhp() {
       <nav className="relative flex items-center justify-center px-6 py-5 my-5">
         <Link
           href="/questOne"
-          className="absolute left-10 flex items-center gap-1 text-white font-poppins text-md hover:opacity-80 transition-opacity border border-white/30 px-4 py-1.5 rounded-full"
+          className="absolute left-10 flex items-center gap-1 text-white font-poppins text-sm hover:opacity-80 transition-opacity border border-white/30 px-4 py-1.5 rounded-full"
         >
           ← back
         </Link>
@@ -118,47 +110,34 @@ export default function QuestAhp() {
       </nav>
 
       <section className="flex justify-center flex-col">
-        {/* Header */}
         <div className="flex flex-col items-center mt-10 text-center px-4">
           <h2 className="font-poppins font-semibold text-xl text-white">
-            Your money, your rules. Even when it comes to investing          {/* <span className="italic">tapi invest dulu yang bener</span> */}
+            Your money, your rules.{" "}
+            <span className="text-[#82E2B3] italic">Even when it comes to investing</span>
           </h2>
           <p className="font-poppins font-light text-sm mt-2 text-white/60">
             Yuk kita cek apa yang paling penting buat kamu dalam berinvestasi
           </p>
         </div>
 
-        {/* Questions */}
         <div className="max-w-xl mx-auto w-full mt-7 space-y-5 px-6">
-          {PAIRWISE_PAIRS.slice(0, visibleCount).map((pair, index) => {
-            const labelA = KRITERIA_LABEL[pair.a];
-            const labelB = KRITERIA_LABEL[pair.b];
-
-            // Ganti "A" dan "B" di options dengan nama kriteria
-            const dynamicOptions = AHP_OPTIONS.map((opt) =>
-              opt
-                .replace("A", labelA)
-                .replace("B", labelB)
-            );
-
-            return (
-              <div
-                key={index}
-                ref={(el) => {
-                  questionRefs.current[index] = el;
-                }}
-                className="transition-all duration-700 ease-out"
-              >
-                <QuestionCard
-                  type="radio"
-                  question={`Kalau kamu mau mulai invest, lebih penting mana — ${labelA} atau ${labelB}?`}
-                  options={dynamicOptions}
-                  value={answers[index]}
-                  onValueChange={(val) => handleChange(index, val)}
-                />
-              </div>
-            );
-          })}
+          {AHP_QUESTIONS.slice(0, visibleCount).map((q, index) => (
+            <div
+              key={index}
+              ref={(el) => { questionRefs.current[index] = el; }}
+              className="transition-all duration-700 ease-out"
+            >
+              <AHPScaleCard
+                question={q.question}
+                kriteria_a={q.pair.a}
+                kriteria_b={q.pair.b}
+                labelA={KRITERIA_LABEL[q.pair.a]}
+                labelB={KRITERIA_LABEL[q.pair.b]}
+                value={answers[index]}
+                onValueChange={(nilai) => handleChange(index, nilai)}
+              />
+            </div>
+          ))}
         </div>
       </section>
 
@@ -189,7 +168,7 @@ export default function QuestAhp() {
               onClick={handleNext}
               className="w-full h-full flex items-center justify-center text-[#82E2B3] font-poppins text-xs font-medium tracking-wider transition-colors duration-200 cursor-pointer"
             >
-              lihat hasil
+              lihat hasil →
             </button>
           )}
         </div>

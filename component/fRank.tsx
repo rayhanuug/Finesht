@@ -56,7 +56,7 @@ export default function RankingPanel({ rankings }: Props) {
       </div>
 
       {/* List — rank 4 dst */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-5">
         {rest.map((item, index) => (
           <RankingCard
             key={index}

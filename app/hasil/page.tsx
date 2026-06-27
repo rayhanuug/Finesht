@@ -7,51 +7,71 @@ import PlanningPanel from "@/component/fRec";
 import RankingPanel from "@/component/fRank";
 import { calculateHealth, KONDISI_LABEL, KONDISI_STATUS, HealthResult } from "@/lib/profilKeuangan";
 import { getFinancialPlan } from "@/lib/planning";
+import { calculateAHP, AHPResult, PairwiseAnswer } from "@/lib/ahpLogic";
+import { MATRIKS_ALTERNATIF_AHP } from "@/lib/altScore";
 
 export default function Hasil() {
-  const [result, setResult] = useState<HealthResult | null>(null);
+  const [healthResult, setHealthResult] = useState<HealthResult | null>(null);
+  const [ahpResult, setAhpResult] = useState<AHPResult | null>(null);
   const [expenseRatio, setExpenseRatio] = useState(0);
 
   useEffect(() => {
-    const raw = localStorage.getItem("finesht_health");
-    if (!raw) return;
+    // ── Financial Health ──
+    const rawHealth = localStorage.getItem("finesht_health");
+    if (rawHealth) {
+      const data = JSON.parse(rawHealth);
 
-    const data = JSON.parse(raw);
+      const calculated = calculateHealth({
+        income: Number(data.income),
+        pengeluaran: Number(data.pengeluaran),
+        cicilan: Number(data.cicilan),
+        tabungan: Number(data.tabungan),
+        danaDarurat: Number(data.danaDarurat),
+      });
 
-    const calculated = calculateHealth({
-      income: Number(data.income),
-      pengeluaran: Number(data.pengeluaran),
-      cicilan: Number(data.cicilan),
-      tabungan: Number(data.tabungan),
-      danaDarurat: Number(data.danaDarurat),
-    });
+      const expense = Number(data.income) > 0
+        ? Math.round((Number(data.pengeluaran) / Number(data.income)) * 100)
+        : 0;
 
-    // Hitung expense ratio langsung dari raw data — cuma buat display
-    const expense = Number(data.income) > 0
-      ? Math.round((Number(data.pengeluaran) / Number(data.income)) * 100)
-      : 0;
+      setHealthResult(calculated);
+      setExpenseRatio(expense);
+    }
 
-    setResult(calculated);
-    setExpenseRatio(expense);
+    // ── AHP ──
+    const rawAhp = localStorage.getItem("finesht_ahp_answers");
+    if (rawAhp) {
+      const ahpAnswers: PairwiseAnswer[] = JSON.parse(rawAhp);
+      const calculated = calculateAHP(ahpAnswers, MATRIKS_ALTERNATIF_AHP);
+      setAhpResult(calculated);
+    }
   }, []);
 
-  if (!result) {
+  // Loading state
+  if (!healthResult || !ahpResult) {
     return (
       <main className="min-h-screen bg-black flex items-center justify-center">
-        <p className="text-white/50 font-poppins text-sm">Menghitung kondisi keuanganmu...</p>
+        <p className="text-white/50 font-poppins text-sm">
+          Menghitung kondisi keuanganmu...
+        </p>
       </main>
     );
   }
 
-  const plan = getFinancialPlan(result.kondisi);
+  const plan = getFinancialPlan(healthResult.kondisi);
   const metricColor = (isSehat: boolean) => isSehat ? "#82E2B3" : "#E2D582";
+
+  // Convert ranking AHP ke format RankingPanel
+  const rankings = ahpResult.ranking.map((item) => ({
+    name: item.nama,
+    match: Math.round(item.skor * 100),
+  }));
 
   return (
     <main className="min-h-screen bg-black relative overflow-hidden">
       <div
-        className="absolute top-0 left-0 w-full h-[400px] opacity-45 pointer-events-none"
+        className="absolute top-0 left-0 w-full h-400 opacity-45 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse 120% 70% at top center, #82E2B3 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 120% 20% at top center, #82E2B3 0%, transparent 70%)",
         }}
       />
 
@@ -87,29 +107,28 @@ export default function Hasil() {
 
           {/* Kiri — Financial Health */}
           <FinancialHealthPanel
-            healthScore={result.score}
-            statusLabel={KONDISI_LABEL[result.kondisi]}
-            status={KONDISI_STATUS[result.kondisi]}
+            healthScore={healthResult.score}
+            statusLabel={KONDISI_LABEL[healthResult.kondisi]}
+            status={KONDISI_STATUS[healthResult.kondisi]}
             metrics={[
               {
                 label: "Debt-to-income Ratio",
-                value: `${result.rasio.dsr}%`,
-                color: metricColor(result.indikator.dsr),
+                value: `${healthResult.rasio.dsr}%`,
+                color: metricColor(healthResult.indikator.dsr),
               },
               {
                 label: "Emergency Ratio",
-                value: `${result.rasio.likuiditas}x`,
-                color: metricColor(result.indikator.likuiditas),
+                value: `${healthResult.rasio.likuiditas}x`,
+                color: metricColor(healthResult.indikator.likuiditas),
               },
               {
                 label: "Saving Rate",
-                value: `${result.rasio.savingRate}%`,
-                color: metricColor(result.indikator.savingRate),
+                value: `${healthResult.rasio.savingRate}%`,
+                color: metricColor(healthResult.indikator.savingRate),
               },
               {
                 label: "Expense Ratio",
                 value: `${expenseRatio}%`,
-                // Sehat kalau expense ratio <= 70% dari income
                 color: expenseRatio <= 70 ? "#82E2B3" : "#E2D582",
               },
             ]}
@@ -122,19 +141,20 @@ export default function Hasil() {
             actions={plan.actions}
           />
 
-          {/* Kanan — Investment Ranking (hardcode dulu) */}
-          <RankingPanel
-            rankings={[
-              { name: "Reksa Dana", match: 92 },
-              { name: "Obligasi", match: 85 },
-              { name: "Deposito", match: 78 },
-              { name: "Saham", match: 65 },
-              { name: "Emas", match: 60 },
-              { name: "Kripto", match: 40 },
-            ]}
-          />
+          {/* Kanan — Investment Ranking dari AHP */}
+          <RankingPanel rankings={rankings} />
 
         </div>
+
+        {/* CR Warning — kalau tidak konsisten */}
+        {!ahpResult.isConsistent && (
+          <div className="max-w-sm mx-auto mb-8 text-center">
+            <p className="text-yellow-400 font-poppins text-xs">
+              Jawaban AHP kurang konsisten (CR: {ahpResult.cr}). Hasil ranking mungkin kurang akurat.
+            </p>
+          </div>
+        )}
+
       </section>
     </main>
   );
