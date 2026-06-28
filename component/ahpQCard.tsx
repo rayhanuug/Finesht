@@ -2,33 +2,28 @@
 
 import { Kriteria } from "@/lib/ahpLogic";
 
-// ──────────────────────────────────────────────
-// KONSTANTA TITIK SKALA SAATY (1-5)
-// ──────────────────────────────────────────────
 const SCALE_POINTS = [
   { label: "Tim Kiri Banget", nilai: 5 },
   { label: "Cenderung Pilih Kiri", nilai: 3 },
-  { label: "Dua-Duanya Sama", nilai: 1 },
+  { label: "Dua-Duanya Sama Penting", nilai: 1 },
   { label: "Cenderung Pilih Kanan", nilai: 1 / 3 },
   { label: "Tim Kanan Banget", nilai: 1 / 5 },
 ];
 
-// Map warna pendaran glow untuk masing-masing kriteria
-const KRITERIA_COLOR: Record<Kriteria, string> = {
-  return: "#82E2B3",        // Emerald Mint
-  risk: "#82B3E2",    // Ice Blue (risk / pengganti risk)
-  likuiditas: "#82E2D4",    // Cyan Aquamarine
-  modal: "#E2C882",         // Gold Amber
-  timeHorizon: "#C882E2",   // Purple Lavender
+const KRITERIA_ICON: Record<Kriteria, string> = {
+  return: "image/ERBg.svg",
+  risk: "image/bull.svg",
+  likuiditas: "image/liq.svg",
+  modal: "image/minim.svg",
+  timeHorizon: "image/Growth.svg",
 };
 
-// Map sub-deskripsi kualitatif untuk memperjelas visualisasi di bawah teks kriteria utama
 const KRITERIA_DESC: Record<Kriteria, string> = {
-  return: "perkiraan keuntungan yang bisa kamu dapatkan dari sebuah investasi",
-  risk: "stabilitas nilai portofolio untuk menjaga agar uang pokok kamu tidak berkurang",
-  likuiditas: "kemudahan pencairan dana secara cepat tanpa denda penalti atau batasan waktu",
-  modal: "kemudahan untuk langsung mulai berinvestasi dari nominal terkecil yang ramah di dompet",
-  timeHorizon: "target pencapaian dana atau jangka waktu jatuh tempo investasi yang sangat pendek",
+  return: "perkiraan keuntungan yang bisa kamu dapatkan dari sebuah investasi.",
+  risk: "Tingkat risiko menunjukkan seberapa besar kemungkinan kamu mengalami kerugian",
+  likuiditas: "seberapa mudah investasi bisa dicairkan jadi uang tunai",
+  modal: "jumlah modal awal yang perlu kamu siapkan untuk mulai investasi",
+  timeHorizon: "lama waktu investasi untuk melihat uang kamu bertumbuh",
 };
 
 interface Props {
@@ -37,8 +32,9 @@ interface Props {
   kriteria_b: Kriteria;
   labelA: string;
   labelB: string;
-  value: number | null;
+  value: number;
   onValueChange: (nilai: number) => void;
+  touched?: boolean;
 }
 
 export default function AHPScaleCard({
@@ -49,164 +45,197 @@ export default function AHPScaleCard({
   labelB,
   value,
   onValueChange,
+  touched = false,
 }: Props) {
-  // Temukan indeks titik aktif berdasarkan nilai Saaty terpilih
-  const activeIndex = value !== null
-    ? SCALE_POINTS.findIndex((p) => p.nilai === value)
-    : -1;
+  const activeIndex = SCALE_POINTS.findIndex((p) => p.nilai === value);
+  const currentStep = touched ? activeIndex : -1;
+  const glowPercent = touched ? (currentStep / 4) * 100 : 50;
 
-  // Cek apakah kecenderungan pilihan berada di Kiri (index 0,1), Seimbang (2), atau Kanan (3,4)
-  const isLeftDominant = activeIndex !== -1 && activeIndex < 2;
-  const isRightDominant = activeIndex !== -1 && activeIndex > 2;
-  const isBalanced = activeIndex === 2;
+  function mapStepToValue(step: number): number {
+    return SCALE_POINTS[step].nilai;
+  }
+
+  const sideA = touched && activeIndex < 2;  
+  const sideB = touched && activeIndex > 2;  
 
   return (
     <div
-      className="rounded-[28px] border border-white/10 p-8 sm:p-10 flex flex-col gap-10 w-full transition-all duration-300 relative overflow-hidden"
+      className="rounded-2xl border border-white/20 overflow-hidden w-full relative"
       style={{
-        background: "rgba(6, 6, 6, 0.45)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        boxShadow: "0 20px 50px rgba(0, 0, 0, 0.3)",
+        background: "rgba(4, 4, 4, 0.20)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
       }}
     >
-      {/* 1. Header Pertanyaan */}
-      <div className="space-y-2 text-center sm:text-left">
-        <h3 className="text-white font-poppins font-medium text-base sm:text-lg leading-relaxed max-w-2xl">
-          {question}
-        </h3>
-      </div>
+      {/* Pertanyaan */}
+      <p className="text-white font-poppins font-semibold text-base leading-relaxed p-6 pb-4">
+        {question}
+      </p>
 
-      {/* 2. Visualisasi Perbandingan Asimetris (Gaya Figma Baru) */}
-      <div className="grid grid-cols-1 md:grid-cols-11 items-center gap-6 py-6 border-y border-white/5 relative">
+      {/* Kontainer Utama Dua Kriteria dengan Background Slanted Highlight */}
+      <div className="relative flex items-stretch min-h-40 px-8 overflow-hidden">
         
-        {/* Kriteria Kiri (A) */}
-        <div className="md:col-span-5 flex flex-col items-center md:items-end text-center md:text-right gap-4 transition-all duration-300">
-          <h2 
-            className={`font-poppins font-bold text-3xl sm:text-4xl tracking-tight transition-all duration-500 transform ${
-              isLeftDominant 
-                ? "scale-105" 
-                : "opacity-45 scale-100"
-            }`}
-            style={{
-              color: isLeftDominant ? KRITERIA_COLOR[kriteria_a] : "#FFFFFF",
-              textShadow: isLeftDominant 
-                ? `0 0 30px ${KRITERIA_COLOR[kriteria_a]}60` 
-                : "none",
-            }}
+        {/* ================= BACKGROUND HIGHLIGHTS (DIAGONAL SEIMBANG 50/50) ================= */}
+        {/* Highlight Sisi Kiri (Green Transparent) - Koordinat disesuaikan agar simetris di tengah */}
+        <div 
+          className="absolute inset-0 pointer-events-none transition-all duration-500 ease-out z-0"
+          style={{
+            background: sideA ? "rgba(130, 226, 179, 0.15)" : "transparent",
+            clipPath: "polygon(0 0, 53% 0, 47% 100%, 0 100%)",
+          }}
+        />
+
+        {/* Highlight Sisi Kanan (Green Transparent) - Koordinat disesuaikan agar simetris di tengah */}
+        <div 
+          className="absolute inset-0 pointer-events-none transition-all duration-500 ease-out z-0"
+          style={{
+            background: sideB ? "rgba(130, 226, 179, 0.15)" : "transparent",
+            clipPath: "polygon(53% 0, 100% 0, 100% 100%, 47% 100%)",
+          }}
+        />
+
+        {/* ================= DIAGONAL DIVIDER & BADGE (CENTERED 50%) ================= */}
+        <div className="absolute inset-0 pointer-events-none z-10">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <line 
+              x1="53%" y1="0" 
+              x2="47%" y2="100%" 
+              stroke="rgba(255, 255, 255, 0.2)" 
+              strokeWidth="1.5" 
+            />
+          </svg>
+          {/* Badge "Or" diletakkan tepat di tengah-tengah kartu (50%) */}
+          <div 
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 bg-[#080808] border border-white/10 px-2.5 py-1 rounded-md text-[10px] text-white tracking-widest font-mono uppercase select-none"
+            style={{ left: "50%" }} 
           >
-            {labelA}
-          </h2>
-          <p className="text-[10.5px] font-poppins font-light text-white/50 leading-relaxed max-w-55">
+            Or
+          </div>
+        </div>
+
+        {/* ================= ISI KONTEN KRITERIA ================= */}
+        {/* Kriteria A — Kiri (Menyesuaikan padding kanan agar tidak tertabrak garis miring) */}
+        <div className="flex-1 flex flex-col justify-between p-5 relative z-10 overflow-hidden select-none pr-6 sm:pr-8">
+          {/* Faint Background Icon */}
+          <div className="absolute bottom-1 right-2 w-2/3 h-2/3 opacity-[0.06] pointer-events-none flex items-end justify-end">
+            {/* <img 
+              src={KRITERIA_ICON[kriteria_a]} 
+              alt="" 
+              className="h-24 w-24 object-contain"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            /> */}
+          </div>
+
+          <div>
+            <p className="text-white font-montserrat font-medium text-sm leading-tight transition-all duration-300">
+              {labelA}
+            </p>
+          </div>
+
+          <p className="text-white font-poppins font-light text-[10px] leading-relaxed mt-3 pr-4 sm:pr-6">
             {KRITERIA_DESC[kriteria_a]}
           </p>
         </div>
 
-        <div className="md:col-span-1 flex justify-center items-center py-2 md:py-0">
-          <div className="relative flex items-center justify-center">
-            <div className="w-[1.5px] h-40 bg-white/10 transform rotate-25 hidden md:block" />
-            <span className="absolute bg-[#080808] border border-white/10 px-2 py-1 rounded-md text-[10px] text-white/40 font-mono uppercase tracking-widest">
-              or
-            </span>
+        {/* Kriteria B — Kanan (Menyesuaikan padding kiri agar tidak tertabrak garis miring) */}
+        <div className="flex-1 flex flex-col justify-between p-5 relative z-10 overflow-hidden select-none pl-6 sm:pl-8">
+          {/* Faint Background Icon */}
+          <div className="absolute bottom-1 left-2 w-2/3 h-2/3 opacity-[0.06] pointer-events-none flex items-end justify-start">
+            {/* <img 
+              src={KRITERIA_ICON[kriteria_b]} 
+              alt="" 
+              className="h-24 w-24 object-contain"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            /> */}
           </div>
-        </div>
 
-        {/* Kriteria Kanan (B) */}
-        <div className="md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left gap-4 transition-all duration-300">
-          <h2 
-            className={`font-poppins font-bold text-3xl sm:text-4xl tracking-tight transition-all duration-500 transform ${
-              isRightDominant 
-                ? "scale-105" 
-                : "opacity-45 scale-100"
-            }`}
-            style={{
-              color: isRightDominant ? KRITERIA_COLOR[kriteria_b] : "#FFFFFF",
-              textShadow: isRightDominant 
-                ? `0 0 30px ${KRITERIA_COLOR[kriteria_b]}60` 
-                : "none",
-            }}
-          >
-            {labelB}
-          </h2>
-          <p className="text-[10.5px] font-poppins font-light text-white/50 leading-relaxed max-w-55">
+          <div className="text-right">
+            <p className="text-white font-montserrat font-medium text-sm leading-tight transition-all duration-300">
+              {labelB}
+            </p>
+          </div>
+
+          <p className="text-white text-right font-poppins font-light text-[10px] leading-relaxed mt-3 pl-4 sm:pl-6">
             {KRITERIA_DESC[kriteria_b]}
           </p>
         </div>
 
       </div>
 
-      {/* 3. Slider Navigasi 5 Titik (Gaya Figma Baru) */}
-      <div className="flex flex-col gap-5 mt-2">
-        
-        {/* Jalur Track & Bulatan Tombol */}
-        <div className="relative flex items-center justify-between px-2 sm:px-4">
-          
-          {/* Garis Dasar Track */}
-          <div className="absolute left-4 right-4 h-2 bg-white/15 top-1/2 -translate-y-1/2" />
+      {/* Slider Navigasi 5 Titik */}
+      <div className="flex flex-col gap-4 px-6 py-5 relative z-20">
 
-          {/* Garis Progress Berwarna Sesuai Kriteria Aktif */}
-          {activeIndex !== -1 && (
+        {/* Track + Titik */}
+        <div className="relative py-4">
+
+          {/* Glow blur di belakang track fill */}
+          {currentStep !== -1 && currentStep !== 2 && (
             <div
-              className="absolute h-1.5 top-1/2 -translate-y-1/2 transition-all duration-500 rounded-full"
+              className="absolute h-1.5 top-1/2 -translate-y-1/2 rounded-full bg-[#82E2B3] blur-[4px] transition-all duration-300 opacity-30"
               style={{
-                left: activeIndex <= 2 ? `${activeIndex * 25}%` : "50%",
-                width: activeIndex <= 2 ? `${50 - (activeIndex * 25)}%` : `${(activeIndex - 2) * 25}%`,
-                background: isLeftDominant 
-                  ? KRITERIA_COLOR[kriteria_a] 
-                  : isRightDominant 
-                  ? KRITERIA_COLOR[kriteria_b] 
-                  : "#82E2AE",
+                left: currentStep < 2 ? `${glowPercent}%` : "50%",
+                right: currentStep > 2 ? `${100 - glowPercent}%` : "50%",
               }}
             />
           )}
 
-          {/* Render 5 Titik Node Interaktif */}
-          {SCALE_POINTS.map((point, i) => {
-            const isSelected = i === activeIndex;
-            let activeColor = "#82E2AE"; // Default netral
-            if (i < 2) activeColor = KRITERIA_COLOR[kriteria_a];
-            if (i > 2) activeColor = KRITERIA_COLOR[kriteria_b];
+          {/* Track */}
+          <div className="h-1 w-full bg-white/10 rounded-full relative">
 
-            return (
+            {/* Track fill hijau — dari titik aktif ke tengah */}
+            {currentStep !== -1 && currentStep !== 2 && (
+              <div
+                className="absolute h-full bg-[#82E2B3] rounded-full transition-all duration-300"
+                style={{
+                  left: currentStep < 2 ? `${glowPercent}%` : "50%",
+                  right: currentStep > 2 ? `${100 - glowPercent}%` : "50%",
+                }}
+              />
+            )}
+
+            {/* Titik-titik */}
+            {[0, 1, 2, 3, 4].map((step) => (
               <button
-                key={i}
+                key={step}
                 type="button"
-                onClick={() => onValueChange(point.nilai)}
-                className="relative color-white z-10 flex flex-col items-center group focus:outline-none"
+                onClick={() => onValueChange(mapStepToValue(step))}
+                className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full border transition-all duration-300 flex items-center justify-center
+                  ${step === currentStep
+                    ? "border-[#82E2B3] bg-black scale-125 z-20 shadow-[0_0_12px_rgba(130,226,179,0.8)]"
+                    : "border-white/10 bg-zinc-900 hover:border-white/30"
+                  }`}
+                style={{ left: `${step * 25}%` }}
               >
-                {/* Node Bulatan */}
-                <div
-                  className={`rounded-full border transition-all duration-300 flex items-center justify-center ${
-                    isSelected
-                      ? "w-5 h-5 border-white scale-110"
-                      : "w-3.5 h-3.5 border-white/20 bg-zinc-950 group-hover:border-white/50 group-hover:scale-105"
-                  }`}
-                  style={{
-                    backgroundColor: isSelected ? activeColor : "transparent",
-                    boxShadow: isSelected
-                      ? `0 0 16px ${activeColor}90`
-                      : "none",
-                  }}
-                >
-                  {isSelected && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                  )}
-                </div>
-
-                {/* Teks Label di Atas / Bawah Node */}
-                <span
-                  className={`absolute top-7 text-center font-poppins text-[10px] whitespace-nowrap transition-all duration-300 pointer-events-none ${
-                    isSelected
-                      ? "text-white font-medium opacity-100"
-                      : "text-white/30 font-light opacity-60 group-hover:text-white/50"
-                  }`}
-                >
-                  {point.label}
-                </span>
+                {step === currentStep && (
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#82E2B3]" />
+                )}
               </button>
-            );
-          })}
+            ))}
+          </div>
+        </div>
 
+        {/* Label */}
+        <div className="flex justify-between select-none">
+          {SCALE_POINTS.map((point, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onValueChange(point.nilai)}
+              className="text-center focus:outline-none"
+              style={{ width: i === 0 || i === 4 ? 56 : 72 }}
+            >
+              <span
+                className="font-poppins text-[10px] leading-tight whitespace-pre-line transition-all duration-300"
+                style={{
+                  color: touched && i === activeIndex
+                    ? "rgba(255,255,255,0.9)"
+                    : "rgba(255,255,255,0.25)",
+                }}
+              >
+                {point.label}
+              </span>
+            </button>
+          ))}
         </div>
 
       </div>

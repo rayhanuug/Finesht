@@ -120,7 +120,7 @@ export default function QuestAhp() {
           </p>
         </div>
 
-        <div className="max-w-xl mx-auto w-full mt-7 space-y-5 px-6">
+        <div className="max-w-2xl mx-auto w-full mt-10 space-y-5 px-6">
           {AHP_QUESTIONS.slice(0, visibleCount).map((q, index) => (
             <div
               key={index}
@@ -135,13 +135,13 @@ export default function QuestAhp() {
                 labelB={KRITERIA_LABEL[q.pair.b]}
                 value={answers[index]}
                 onValueChange={(nilai) => handleChange(index, nilai)}
+                touched={touched[index]}
               />
             </div>
           ))}
         </div>
       </section>
 
-      {/* Sticky Bottom Button */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-70 px-3">
         <div
           className={`backdrop-blur-xl rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] flex items-center justify-center transition-all duration-300 ease-out h-7 border
