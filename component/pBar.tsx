@@ -60,7 +60,7 @@ export default function ProgressBar(props: Props) {
         />
       </div>
 
-      {/* Warning percent */}
+      {/* err handlign: Warning percent */}
       {isPercent && isOver && (
         <p className="font-poppins text-xs text-center text-red-500 transition-all duration-200">
             Total melebihi 100%

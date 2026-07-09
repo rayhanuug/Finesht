@@ -10,15 +10,14 @@ type Props = {
 };
 
 export default function RankingPanel({ rankings }: Props) {
-  const podium = rankings.slice(0, 3);   // rank 1, 2, 3
-  const rest = rankings.slice(3);         // rank 4, 5, dst
+  const podium = rankings.slice(0, 3);  
+  const rest = rankings.slice(3);        
 
   return (
     <div className="flex flex-col gap-4">
-
-      {/* Podium — rank 1 di tengah lebih tinggi */}
+      {/* Rank */}
       <div className="flex items-end gap-3">
-        {/* Rank 2 — kiri */}
+        {/* Rank 2 */}
         {podium[1] && (
           <div className="flex-1">
             <RankingCard
@@ -30,7 +29,7 @@ export default function RankingPanel({ rankings }: Props) {
           </div>
         )}
 
-        {/* Rank 1 — tengah, lebih tinggi */}
+        {/* Rank 1 */}
         {podium[0] && (
           <div className="flex-1 mb-4">
             <RankingCard
@@ -42,7 +41,7 @@ export default function RankingPanel({ rankings }: Props) {
           </div>
         )}
 
-        {/* Rank 3 — kanan */}
+        {/* Rank 3 */}
         {podium[2] && (
           <div className="flex-1">
             <RankingCard
@@ -55,7 +54,7 @@ export default function RankingPanel({ rankings }: Props) {
         )}
       </div>
 
-      {/* List — rank 4 dst */}
+      {/* rank 4 kebawah */}
       <div className="flex flex-col gap-5">
         {rest.map((item, index) => (
           <RankingCard

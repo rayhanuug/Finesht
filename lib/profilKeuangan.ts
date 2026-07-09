@@ -1,9 +1,3 @@
-// ============================================================
-// calculateHealth.ts
-// Logika kalkulasi kesehatan keuangan berdasarkan:
-// - Jurnal Putra et al. (2024) — Analisis Rasio Keuangan Pribadi
-// - Asad (2014) — Financial Check Up: In What Stage Are You?
-// ============================================================
 
 export type KondisiKeuangan =
   | "shocked"
@@ -13,35 +7,31 @@ export type KondisiKeuangan =
   | "free";
 
 export interface HealthInput {
-  income: number;        // penghasilan bulanan
-  pengeluaran: number;   // total pengeluaran bulanan
-  cicilan: number;       // total cicilan bulanan
-  tabungan: number;      // tabungan bulanan
-  danaDarurat: number;   // total dana darurat / kas yang dimiliki
+  income: number;        
+  pengeluaran: number;  
+  cicilan: number;       
+  tabungan: number;      
+  danaDarurat: number;   
 }
 
 export interface HealthResult {
-  score: number;               // 0-100
+  score: number;               
   kondisi: KondisiKeuangan;
   rasio: {
-    dsr: number;               // Debt Service Ratio (%)
-    savingRate: number;        // Saving Rate (%)
-    likuiditas: number;        // Rasio Likuiditas (x bulan)
-    cashflow: number;          // Cashflow (% dari income)
+    dsr: number;               
+    savingRate: number;        
+    likuiditas: number;        
+    cashflow: number;          
   };
   indikator: {
-    dsr: boolean;              // true = sehat
+    dsr: boolean;              
     savingRate: boolean;
     likuiditas: boolean;
     cashflow: boolean;
   };
 }
 
-// ============================================================
-// SCORING — Interpolasi proporsional (non-fixed)
-// Setiap indikator max 25 poin → total max 100
-// ============================================================
-
+// SCORING dalam bemtuk persen
 function scoreDSR(dsr: number): number {
   if (dsr <= 0) return 25;
   if (dsr >= 0.35) return 0;
@@ -59,15 +49,9 @@ function scoreLikuiditas(likuiditas: number): number {
 }
 
 function scoreCashflow(cashflowPct: number): number {
-  // Cashflow ideal = 30%+ dari income
-  // Negatif = 0 poin
   if (cashflowPct <= 0) return 0;
   return Math.min(cashflowPct / 0.30, 1) * 25;
 }
-
-// ============================================================
-// KONDISI — Priority-based sesuai Asad (2014)
-// ============================================================
 
 function determineKondisi(
   indikator: HealthResult["indikator"],
@@ -90,10 +74,6 @@ function determineKondisi(
   return "stressed";
 }
 
-// ============================================================
-// KONDISI LABEL — untuk display di UI
-// ============================================================
-
 export const KONDISI_LABEL: Record<KondisiKeuangan, string> = {
   shocked: "Financially Shocked",
   stressed: "Financially Stressed",
@@ -110,32 +90,29 @@ export const KONDISI_STATUS: Record<KondisiKeuangan, string> = {
   free: "Keuanganmu sangat sehat",
 };
 
-// ============================================================
 // MAIN FUNCTION
-// ============================================================
-
 export function calculateHealth(input: HealthInput): HealthResult {
   const { income, pengeluaran, cicilan, tabungan, danaDarurat } = input;
 
-  // Hitung rasio
+  // ini Hitung rasio
   const dsr = income > 0 ? cicilan / income : 0;
   const savingRate = income > 0 ? tabungan / income : 0;
   const cashflowNominal = income - pengeluaran - cicilan;
   const cashflowPct = income > 0 ? cashflowNominal / income : 0;
   const likuiditas = pengeluaran > 0 ? danaDarurat / pengeluaran : 0;
 
-  // Hitung score per indikator
+  // ini score per indikator
   const scoreDSRVal = scoreDSR(dsr);
   const scoreSavingVal = scoreSavingRate(savingRate);
   const scoreLikuiditasVal = scoreLikuiditas(likuiditas);
   const scoreCashflowVal = scoreCashflow(cashflowPct);
 
-  // Total score (0-100)
+  // ini Total score (0-100)
   const score = Math.round(
     scoreDSRVal + scoreSavingVal + scoreLikuiditasVal + scoreCashflowVal
   );
 
-  // Indikator boolean
+  // ini Indikator boolean
   const indikator = {
     dsr: dsr < 0.35,
     savingRate: savingRate >= 0.10,
@@ -143,7 +120,7 @@ export function calculateHealth(input: HealthInput): HealthResult {
     cashflow: cashflowNominal > 0,
   };
 
-  // Tentukan kondisi
+  // cek kondisi
   const kondisi = determineKondisi(indikator, likuiditas);
 
   return {

@@ -1,7 +1,7 @@
 type Props = {
   label: string;
   value: string;
-  color?: string; // default #82E2B3
+  color?: string;
 };
 
 export default function FinancialMetric({ label, value, color = "#82E2B3" }: Props) {

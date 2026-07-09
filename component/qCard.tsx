@@ -38,16 +38,17 @@ function ChipOptions({
   onSelect: (opt: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2 mb-5">
+    <div className="flex flex-wrap gap-2 mb-3">
       {options.map((opt) => (
         <button
           key={opt}
+          type="button"
           onClick={() => onSelect(opt)}
-          className={`px-4 py-1.5 rounded-xl border text-xs font-poppins transition-all duration-200
-            ${selected === opt
+          className={`px-3 py-2 sm:px-4 sm:py-1.5 rounded-xl border text-xs font-poppins transition-all duration-200 ${
+            selected === opt
               ? "bg-white text-black border-white"
               : "bg-transparent text-white/70 border-white/30 hover:border-white/70 hover:text-white"
-            }`}
+          }`}
         >
           {opt}
         </button>
@@ -76,7 +77,7 @@ function RadioOptions({
           className="flex items-center gap-3 cursor-pointer group"
         >
           <div
-            className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 transition-all duration-200
+            className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-200
               ${selected === opt
                 ? "border-white"
                 : "border-white/40 group-hover:border-white/70"
@@ -101,8 +102,6 @@ function InputRp({
   onChange: (val: string) => void;
 }) {
   const isFocused = value !== "";
-
-  // Format angka dengan titik — "3000000" → "3.000.000"
   function formatDisplay(val: string): string {
     if (!val) return "";
     const num = val.replace(/\D/g, "");
@@ -110,7 +109,6 @@ function InputRp({
   }
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
-    // Strip titik sebelum simpan ke state — tetap angka murni
     const raw = e.target.value.replace(/\./g, "");
     if (/^\d*$/.test(raw)) {
       onChange(raw);
@@ -178,12 +176,12 @@ function ChipWithInput({
     setSelected(opt);
     const angka = convertToAngka(opt);
     setInputValue(angka);
-    onValueChange?.(angka); // ← kirim ke parent saat chip dipilih
+    onValueChange?.(angka); 
   }
 
   function handleInputChange(val: string) {
     setInputValue(val);
-    onValueChange?.(val); // ← kirim ke parent saat input manual
+    onValueChange?.(val); 
   }
 
   return (
@@ -219,12 +217,10 @@ export default function QuestionCard({ question, type, options = [], onValueChan
         WebkitBackdropFilter: "blur(12px)",
       }}
     >
-      {/* Question */}
       <p className="text-white font-poppins font-medium text-sm leading-relaxed">
         {question}
       </p>
 
-      {/* Content */}
       {type === "chip" && (
         <ChipOptions options={options} selected={null} onSelect={(val) => onValueChange?.(val)} />
       )}

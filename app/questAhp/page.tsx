@@ -10,12 +10,11 @@ import { AHP_QUESTIONS } from "@/lib/ahpQuest";
 export default function QuestAhp() {
   const router = useRouter();
 
-  // Default semua tengah (nilai 1 = Sama Penting)
   const [answers, setAnswers] = useState<Record<number, number>>(
     Object.fromEntries(AHP_QUESTIONS.map((_, i) => [i, 1]))
   );
 
-  // Track pertanyaan yang udah disentuh user
+  // Track pertanyaan
   const [touched, setTouched] = useState<Record<number, boolean>>(
     Object.fromEntries(AHP_QUESTIONS.map((_, i) => [i, false]))
   );
@@ -61,7 +60,7 @@ export default function QuestAhp() {
       return updated;
     });
 
-    // Auto scroll ke pertanyaan berikutnya
+    // scroll kepretanyaan
     setTimeout(() => {
       const nextRef = questionRefs.current[index + 1];
       if (nextRef) {
@@ -89,33 +88,33 @@ export default function QuestAhp() {
   return (
     <main className="min-h-screen bg-black relative overflow-hidden pb-40">
       <div
-        className="absolute top-0 left-0 w-full h-[400px] opacity-45 pointer-events-none"
+        className="absolute top-0 left-0 w-full h-130 md:h-100 opacity-45 pointer-events-none"
         style={{
           background:
             "radial-gradient(ellipse 120% 70% at top center, #82E2B3 0%, transparent 70%)",
         }}
       />
 
-      {/* Navbar */}
-      <nav className="relative flex items-center justify-center px-6 py-5 my-5">
+      <nav className="relative flex items-center justify-between md:justify-center px-6 py-5 my-5 w-full">
         <Link
           href="/questOne"
-          className="absolute left-10 flex items-center gap-1 text-white font-poppins text-sm hover:opacity-80 transition-opacity border border-white/30 px-4 py-1.5 rounded-full"
+          className="relative md:absolute md:left-10 flex items-center gap-1 text-white font-poppins text-sm hover:opacity-80 transition-opacity border border-white/30 px-4 py-1.5 rounded-full"
         >
           ← back
         </Link>
-        <span className="text-white font-outfit font-bold text-2xl tracking-tight">
+        
+        <span className="text-white font-outfit font-bold text-2xl md:text-2xl tracking-tight md:mx-auto relative">
           Finesht
         </span>
       </nav>
 
       <section className="flex justify-center flex-col">
         <div className="flex flex-col items-center mt-10 text-center px-4">
-          <h2 className="font-poppins font-semibold text-xl text-white">
+          <h2 className="font-poppins w-75 font-semibold text-xl text-white md:w-auto">
             Your money, your rules.{" "}
             <span className="text-[#82E2B3] italic">Even when it comes to investing</span>
           </h2>
-          <p className="font-poppins font-light text-sm mt-2 text-white/60">
+          <p className="font-poppins font-light text-xs w-70 mt-2 text-white/60 md:w-auto">
             Yuk kita cek apa yang paling penting buat kamu dalam berinvestasi
           </p>
         </div>

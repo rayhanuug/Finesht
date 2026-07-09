@@ -21,7 +21,6 @@ export default function FinancialHealthPanel({
 }: Props) {
   return (
     <div className="flex flex-col gap-3">
-
       {/* Health Score Card */}
       <div
         className="rounded-xl border border-white/10 p-5 flex flex-col gap-4"
@@ -31,7 +30,6 @@ export default function FinancialHealthPanel({
           WebkitBackdropFilter: "blur(12px)",
         }}
       >
-        {/* Header */}
         <div className="flex items-center justify-between">
           <span className="text-white font-poppins font-semibold text-base">
             Health Score
@@ -44,7 +42,7 @@ export default function FinancialHealthPanel({
           </span>
         </div>
 
-        {/* Score */}
+        {/*Score*/}
         <div className="flex items-end gap-1">
           <span
             className="font-poppins font-bold text-5xl leading-none"
@@ -54,12 +52,10 @@ export default function FinancialHealthPanel({
           </span>
           <span className="text-white/40 font-poppins text-lg mb-1">/100</span>
         </div>
-
-        {/* Progress Bar */}
         <ProgressBar mode="step" current={healthScore} total={100} />
       </div>
 
-      {/* Status Kebebasan Finansial */}
+      {/*Status*/}
       <div
         className="rounded-xl border border-white/10 p-4 flex items-center gap-3"
         style={{
@@ -83,8 +79,6 @@ export default function FinancialHealthPanel({
           </span>
         </div>
       </div>
-
-      {/* Metrics Grid */}
       <div className="grid grid-cols-2 gap-3">
         {metrics.map((m) => (
           <FinancialMetric
@@ -95,7 +89,6 @@ export default function FinancialHealthPanel({
           />
         ))}
       </div>
-
     </div>
   );
 }

@@ -4,7 +4,6 @@ import Image from "next/image";
 export default function Home(){
         return (
         <main className="relative min-h-screen bg-[#0a0a0a] flex flex-col overflow-hidden">
-          {/* ini Navbar */}
           <nav className="px-6 py-6 md:px-12 lg:px-16">
             <Link
               href="/"
@@ -14,19 +13,15 @@ export default function Home(){
             </Link>
           </nav>
     
-          {/* ini Hero Content */}
           <section className="flex-1 flex flex-col justify-center md:justify-center px-6 pt-16 md:pt-0 md:px-12 lg:px-16 lg:mb-10 md:max-w-4xl">
-            {/* ini Tag */}
             <p className="text-white text-sm font-outfit font-semibold mb-3 ml-1 tracking-wide">
               | Finesht / Finance lab
             </p>
     
-            {/* ini Headline */}
             <h1 className="text-white font-montserrat font-semibold text-[2rem] leading-[1.15] mb-5 w-75 md:text-3xl md:w-100 md:mb-6 lg:text-5xl lg:w-3xl  ">
-              Personal Finance & Investment Recomendation
+              Personal Finance & Investment Recommendation
             </h1>
     
-            {/* ini deskripsi */}
             <p className="text-white font-poppins font-light text-sm leading-relaxed w-80 md:text-base md:max-w-lg mb-8 md:mb-14 lg:text-sm lg:w-7xl">
               Many financial decisions are made without a clear understanding of
               personal financial conditions. This platform is built to help you

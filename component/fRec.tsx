@@ -21,7 +21,6 @@ export default function PlanningPanel({ priority, description, actions }: Props)
         WebkitBackdropFilter: "blur(12px)",
       }}
     >
-      {/* Header */}
       <div className="flex flex-col gap-2">
         <span className="text-white font-poppins font-light text-xs">
           Prioritas Utama
@@ -35,8 +34,6 @@ export default function PlanningPanel({ priority, description, actions }: Props)
       </div>
 
       <p className="text-white font-poppins font-medium text-md mt-5">Smart planning</p>
-
-      {/* Action Items */}
       <div className="flex flex-col gap-5">
         {actions.map((action, index) => (
           <ActionItem

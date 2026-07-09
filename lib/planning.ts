@@ -1,11 +1,3 @@
-// ============================================================
-// financialPlanning.ts
-// Data financial planning per kondisi keuangan berdasarkan:
-// - Asad (2014) — Financial Check Up: In What Stage Are You?
-// - Widhiastuti — Pengelolaan Perencanaan Keuangan
-// - Nurhalimah (2021), Pratama (2019), Damodaran (2012)
-//   dalam Maulidia et al. (2024) — Investasi Cerdas
-// ============================================================
 
 import { KondisiKeuangan } from "./profilKeuangan";
 
@@ -21,10 +13,7 @@ export interface FinancialPlan {
 }
 
 export const FINANCIAL_PLANNING: Record<KondisiKeuangan, FinancialPlan> = {
-  // ──────────────────────────────────────────────
-  // SHOCKED
-  // Cashflow negatif + DSR >35%
-  // ──────────────────────────────────────────────
+  // SHOCKED 
   shocked: {
     prioritas: "Stabilkan Kondisi Keuanganmu Dulu",
     deskripsi:
@@ -48,10 +37,7 @@ export const FINANCIAL_PLANNING: Record<KondisiKeuangan, FinancialPlan> = {
     ],
   },
 
-  // ──────────────────────────────────────────────
-  // STRESSED
-  // Salah satu indikator utama buruk
-  // ──────────────────────────────────────────────
+  // STRESSED 
   stressed: {
     prioritas: "Perbaiki Cashflow dan Bangun Kebiasaan Menabung",
     deskripsi:
@@ -75,10 +61,7 @@ export const FINANCIAL_PLANNING: Record<KondisiKeuangan, FinancialPlan> = {
     ],
   },
 
-  // ──────────────────────────────────────────────
-  // STRESSLESS
-  // Semua oke + DD 3-6x
-  // ──────────────────────────────────────────────
+  // STRESSLESS 
   stressless: {
     prioritas: "Perkuat Dana Darurat dan Kenalan sama Investasi",
     deskripsi:
@@ -102,10 +85,7 @@ export const FINANCIAL_PLANNING: Record<KondisiKeuangan, FinancialPlan> = {
     ],
   },
 
-  // ──────────────────────────────────────────────
   // STRESSFREE
-  // Semua oke + DD 6-12x
-  // ──────────────────────────────────────────────
   stressfree: {
     prioritas: "Optimalkan Portofolio dan Tingkatkan Dana Darurat",
     deskripsi:
@@ -129,10 +109,7 @@ export const FINANCIAL_PLANNING: Record<KondisiKeuangan, FinancialPlan> = {
     ],
   },
 
-  // ──────────────────────────────────────────────
-  // FREE
-  // Semua oke + DD >12x
-  // ──────────────────────────────────────────────
+  // FREE 
   free: {
     prioritas: "Fokus ke Pertumbuhan Aset Jangka Panjang",
     deskripsi:
@@ -157,9 +134,7 @@ export const FINANCIAL_PLANNING: Record<KondisiKeuangan, FinancialPlan> = {
   },
 };
 
-// ──────────────────────────────────────────────
 // Helper — ambil planning berdasarkan kondisi
-// ──────────────────────────────────────────────
 export function getFinancialPlan(kondisi: KondisiKeuangan): FinancialPlan {
   return FINANCIAL_PLANNING[kondisi];
 }

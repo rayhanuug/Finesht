@@ -1,8 +1,3 @@
-// ============================================================
-// alternativeScores.ts
-// Skor alternatif investasi hasil normalisasi AHP
-// 8 alternatif × 5 kriteria
-// ============================================================
 
 import { Alternatif, Kriteria } from "./ahpLogic";
 

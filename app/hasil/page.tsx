@@ -16,7 +16,7 @@ export default function Hasil() {
   const [expenseRatio, setExpenseRatio] = useState(0);
 
   useEffect(() => {
-    // ── Financial Health ──
+    // ini hasil Financial Health
     const rawHealth = localStorage.getItem("finesht_health");
     if (rawHealth) {
       const data = JSON.parse(rawHealth);
@@ -37,7 +37,7 @@ export default function Hasil() {
       setExpenseRatio(expense);
     }
 
-    // ── AHP ──
+    // ini ahp
     const rawAhp = localStorage.getItem("finesht_ahp_answers");
     if (rawAhp) {
       const ahpAnswers: PairwiseAnswer[] = JSON.parse(rawAhp);
@@ -51,7 +51,7 @@ export default function Hasil() {
     return (
       <main className="min-h-screen bg-black flex items-center justify-center">
         <p className="text-white/50 font-poppins text-sm">
-          Menghitung kondisi keuanganmu...
+          Chill out sistemnya lagi ngitung...
         </p>
       </main>
     );
@@ -60,7 +60,6 @@ export default function Hasil() {
   const plan = getFinancialPlan(healthResult.kondisi);
   const metricColor = (isSehat: boolean) => isSehat ? "#82E2B3" : "#E2D582";
 
-  // Convert ranking AHP ke format RankingPanel
   const rankings = ahpResult.ranking.map((item) => ({
     name: item.nama,
     match: Math.round(item.skor * 100),
@@ -88,24 +87,18 @@ export default function Hasil() {
         </span>
       </nav>
 
-      {/* Content */}
       <section className="relative z-10 flex flex-col px-6 md:px-10">
-
-        {/* Header */}
         <div className="flex flex-col items-center mt-10 mb-8">
           <h2 className="font-poppins font-semibold text-xl text-white">
             Here's Your <span className="text-[#82E2B3]">Financial </span>
             <span className="text-[#82E2B3] underline italic">SnapShot</span>
           </h2>
-          <p className="font-poppins font-light text-xs mt-2 text-white/60">
-            This is how your financial situation looks today
+          <p className="font-poppins text-center w-70 font-light text-xs mt-2 text-white/60">
+            This is how your financial situation looks today And see which investment fits you best
           </p>
         </div>
 
-        {/* 3 Kolom */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10">
-
-          {/* Kiri — Financial Health */}
           <FinancialHealthPanel
             healthScore={healthResult.score}
             statusLabel={KONDISI_LABEL[healthResult.kondisi]}
@@ -133,27 +126,22 @@ export default function Hasil() {
               },
             ]}
           />
-
-          {/* Tengah — Financial Planning */}
           <PlanningPanel
             priority={plan.prioritas}
             description={plan.deskripsi}
             actions={plan.actions}
           />
-
-          {/* Kanan — Investment Ranking dari AHP */}
           <RankingPanel rankings={rankings} />
-
         </div>
 
         {/* CR Warning — kalau tidak konsisten */}
-        {!ahpResult.isConsistent && (
+        {/* {!ahpResult.isConsistent && (
           <div className="max-w-sm mx-auto mb-8 text-center">
             <p className="text-yellow-400 font-poppins text-xs">
               Jawaban AHP kurang konsisten (CR: {ahpResult.cr}). Hasil ranking mungkin kurang akurat.
             </p>
           </div>
-        )}
+        )} */}
 
       </section>
     </main>

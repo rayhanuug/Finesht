@@ -71,12 +71,10 @@ export default function AHPScaleCard({
       <p className="text-white font-poppins font-semibold text-base leading-relaxed p-6 pb-4">
         {question}
       </p>
-
-      {/* Kontainer Utama Dua Kriteria dengan Background Slanted Highlight */}
-      <div className="relative flex items-stretch min-h-40 px-8 overflow-hidden">
-        
-        {/* ================= BACKGROUND HIGHLIGHTS (DIAGONAL SEIMBANG 50/50) ================= */}
-        {/* Highlight Sisi Kiri (Green Transparent) - Koordinat disesuaikan agar simetris di tengah */}
+      
+      {/* konten tengah pertanyaan */}
+      <div className="relative flex items-stretch min-h-40 px-8 overflow-hidden my-1">
+        {/* Highlight Sisi Kiri (Green Transparent)*/}
         <div 
           className="absolute inset-0 pointer-events-none transition-all duration-500 ease-out z-0"
           style={{
@@ -85,7 +83,7 @@ export default function AHPScaleCard({
           }}
         />
 
-        {/* Highlight Sisi Kanan (Green Transparent) - Koordinat disesuaikan agar simetris di tengah */}
+        {/*Highlight Sisi Kanan (Green Transparent)*/}
         <div 
           className="absolute inset-0 pointer-events-none transition-all duration-500 ease-out z-0"
           style={{
@@ -94,7 +92,6 @@ export default function AHPScaleCard({
           }}
         />
 
-        {/* ================= DIAGONAL DIVIDER & BADGE (CENTERED 50%) ================= */}
         <div className="absolute inset-0 pointer-events-none z-10">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <line 
@@ -104,7 +101,6 @@ export default function AHPScaleCard({
               strokeWidth="1.5" 
             />
           </svg>
-          {/* Badge "Or" diletakkan tepat di tengah-tengah kartu (50%) */}
           <div 
             className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 bg-[#080808] border border-white/10 px-2.5 py-1 rounded-md text-[10px] text-white tracking-widest font-mono uppercase select-none"
             style={{ left: "50%" }} 
@@ -113,17 +109,9 @@ export default function AHPScaleCard({
           </div>
         </div>
 
-        {/* ================= ISI KONTEN KRITERIA ================= */}
-        {/* Kriteria A — Kiri (Menyesuaikan padding kanan agar tidak tertabrak garis miring) */}
-        <div className="flex-1 flex flex-col justify-between p-5 relative z-10 overflow-hidden select-none pr-6 sm:pr-8">
-          {/* Faint Background Icon */}
+        {/* isi konten tengah di pertanyaan */}
+        <div className="flex-1 flex flex-col justify-between py-5 px-1 relative z-10 overflow-hidden select-none pr-6 sm:pr-8">
           <div className="absolute bottom-1 right-2 w-2/3 h-2/3 opacity-[0.06] pointer-events-none flex items-end justify-end">
-            {/* <img 
-              src={KRITERIA_ICON[kriteria_a]} 
-              alt="" 
-              className="h-24 w-24 object-contain"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            /> */}
           </div>
 
           <div>
@@ -132,21 +120,13 @@ export default function AHPScaleCard({
             </p>
           </div>
 
-          <p className="text-white font-poppins font-light text-[10px] leading-relaxed mt-3 pr-4 sm:pr-6">
+          <p className="text-white font-poppins font-light text-[8px] md:text-[12px] leading-relaxed mt-3 pr-4 sm:pr-6">
             {KRITERIA_DESC[kriteria_a]}
           </p>
         </div>
 
-        {/* Kriteria B — Kanan (Menyesuaikan padding kiri agar tidak tertabrak garis miring) */}
-        <div className="flex-1 flex flex-col justify-between p-5 relative z-10 overflow-hidden select-none pl-6 sm:pl-8">
-          {/* Faint Background Icon */}
+        <div className="flex-1 flex flex-col justify-between py-5 px-1 relative z-10 overflow-hidden select-none pl-6 sm:pl-8">
           <div className="absolute bottom-1 left-2 w-2/3 h-2/3 opacity-[0.06] pointer-events-none flex items-end justify-start">
-            {/* <img 
-              src={KRITERIA_ICON[kriteria_b]} 
-              alt="" 
-              className="h-24 w-24 object-contain"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            /> */}
           </div>
 
           <div className="text-right">
@@ -155,7 +135,7 @@ export default function AHPScaleCard({
             </p>
           </div>
 
-          <p className="text-white text-right font-poppins font-light text-[10px] leading-relaxed mt-3 pl-4 sm:pl-6">
+          <p className="text-white text-right text-[8px] font-poppins font-light md:text-[12px] leading-relaxed mt-3 pl-4 sm:pl-6">
             {KRITERIA_DESC[kriteria_b]}
           </p>
         </div>
@@ -164,14 +144,10 @@ export default function AHPScaleCard({
 
       {/* Slider Navigasi 5 Titik */}
       <div className="flex flex-col gap-4 px-6 py-5 relative z-20">
-
-        {/* Track + Titik */}
         <div className="relative py-4">
-
-          {/* Glow blur di belakang track fill */}
           {currentStep !== -1 && currentStep !== 2 && (
             <div
-              className="absolute h-1.5 top-1/2 -translate-y-1/2 rounded-full bg-[#82E2B3] blur-[4px] transition-all duration-300 opacity-30"
+              className="absolute h-1.5 top-1/2 -translate-y-1/2 rounded-full bg-[#82E2B3] blur-xs transition-all duration-300 opacity-30"
               style={{
                 left: currentStep < 2 ? `${glowPercent}%` : "50%",
                 right: currentStep > 2 ? `${100 - glowPercent}%` : "50%",
@@ -181,8 +157,6 @@ export default function AHPScaleCard({
 
           {/* Track */}
           <div className="h-1 w-full bg-white/10 rounded-full relative">
-
-            {/* Track fill hijau — dari titik aktif ke tengah */}
             {currentStep !== -1 && currentStep !== 2 && (
               <div
                 className="absolute h-full bg-[#82E2B3] rounded-full transition-all duration-300"
@@ -193,7 +167,6 @@ export default function AHPScaleCard({
               />
             )}
 
-            {/* Titik-titik */}
             {[0, 1, 2, 3, 4].map((step) => (
               <button
                 key={step}
@@ -214,7 +187,6 @@ export default function AHPScaleCard({
           </div>
         </div>
 
-        {/* Label */}
         <div className="flex justify-between select-none">
           {SCALE_POINTS.map((point, i) => (
             <button
@@ -237,7 +209,6 @@ export default function AHPScaleCard({
             </button>
           ))}
         </div>
-
       </div>
     </div>
   );

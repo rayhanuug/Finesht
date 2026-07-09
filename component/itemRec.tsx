@@ -14,7 +14,6 @@ export default function ActionItem({ number, title, description }: Props) {
     >
       {}
       <span
-        // className="font-poppins font-regular text-transparent [-webkit-text-stroke:0.3px_#82E2AE] text-7xl shrink-0 w-10 inline-block text-left"
         className={`font-poppins font-regular text-5xl shrink-0 w-7 inline-block text-left transition-all duration-300 transform ${
           isFirst
             ? "text-transparent [-webkit-text-stroke:0.8px_rgba(130,226,174,0.5)] translate-x-1.5"
@@ -23,7 +22,6 @@ export default function ActionItem({ number, title, description }: Props) {
       >
         {number}
       </span>
-
       {}
       <div className="flex flex-col gap-1 pt-1">
         <span className="text-white font-poppins font-medium text-[10px]">

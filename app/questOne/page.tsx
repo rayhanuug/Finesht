@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import QuestionCard from "@/component/qCard";
-import ProgressBar from "@/component/pBar";
 
 export default function QuestOne() {
   const router = useRouter();
@@ -23,7 +22,6 @@ export default function QuestOne() {
   const q3Ref = useRef<HTMLDivElement>(null);
   const q4Ref = useRef<HTMLDivElement>(null);
   const q5Ref = useRef<HTMLDivElement>(null);
-  const nextBtnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -106,137 +104,125 @@ export default function QuestOne() {
   return (
     <main className="min-h-screen bg-black relative overflow-hidden pb-40">
       <div
-        className="absolute top-0 left-0 w-full h-[400px] opacity-45 pointer-events-none"
+        className="absolute top-0 left-0 w-full h-130 md:h-100 opacity-45 pointer-events-none"
         style={{
           background:
             "radial-gradient(ellipse 120% 70% at top center, #82E2B3 0%, transparent 70%)",
         }}
       />
 
-      {/* Navbar */}
-      <nav className="relative flex items-center justify-center px-6 py-5 my-5">
+      <nav className="relative flex items-center justify-between md:justify-center px-6 py-5 my-3 md:my-5 w-full">
         <Link
-          href="/"
-          className="absolute left-10 bottom-6.5 flex items-center gap-1 text-white font-poppins text-md hover:opacity-80 transition-opacity"
+          href="/" className="md:absolute md:left-10 flex items-center gap-1 text-white font-poppins text-sm md:text-md hover:opacity-80 transition-opacity"
         >
           home
-        </Link>
-        <span className="text-white font-outfit font-bold text-2xl tracking-tight">
+        </Link>  
+        <span className="text-white font-outfit font-bold text-xl md:text-2xl tracking-tight md:mx-auto">
           Finesht
         </span>
       </nav>
 
       <section className="flex justify-center flex-col">
-        {/* Header */}
-        <div className="flex flex-col items-center mt-10 text-center px-4">
-          <h2 className="font-poppins font-semibold text-xl text-white">
-            <em>In this economy</em>&nbsp;seberapa&nbsp;
-            <span className="text-[#82E2B3] underline">survive</span>&nbsp;
-            <span className="text-[#82E2B3]">finansialmu?</span>
+        <div className="flex flex-col items-center mt-8 mb-5 md:mt-10 text-center px-6">
+          <h2 className="font-poppins font-semibold text-xl w-80 sm:text-xl text-white md:w-auto md:text-2xl">
+            <em>In this economy</em> seberapa <span className="text-[#82E2B3] underline"> survive</span> <span className="text-[#82E2B3]"> finansialmu?</span>
           </h2>
-          <p className="font-poppins font-light text-sm mt-2 text-white/60">
+          <p className="font-poppins font-light text-xs w-50 sm:text-sm mt-2 text-white/60 max-w-xs sm:max-w-sm md:w-100">
             yuk, kita cek kesehatan dan kebebasan financialmu!
           </p>
         </div>
 
         {/* Questions Area */}
-        <div className="max-w-xl mx-auto w-full mt-7 space-y-5 px-6">
-
-          {/* Pertanyaan 1 */}
+        <div className="max-w-xl mx-auto w-full mt-7 space-y-5 px-4 sm:px-6">
+          {/*ini Q-1 */}
           <div className="transition-all duration-500 opacity-100 transform translate-y-0">
             <QuestionCard
               type="chip-input"
               question="Berapa penghasilan bulananmu?"
               options={["3 Jt", "5 Jt", "7 Jt", "10 Jt", "15 Jt"]}
-              value={answers.income}
               onValueChange={(val) => handleChange("income", val)}
             />
           </div>
 
-          {/* Pertanyaan 2 */}
+          {/*ini Q-2 */}
           {answers.income !== "" && (
-            <div 
-              ref={q2Ref} 
+            <div
+              ref={q2Ref}
               className="transition-all duration-700 ease-out opacity-100 transform translate-y-0"
             >
               <QuestionCard
                 type="chip-input"
                 question="Berapa total pengeluaran rutinmu dalam sebulan?"
                 options={["1 Jt", "2 Jt", "3 Jt", "5 Jt", "7 Jt"]}
-                value={answers.pengeluaran}
                 onValueChange={(val) => handleChange("pengeluaran", val)}
               />
             </div>
           )}
 
-          {/* Pertanyaan 3 */}
+          {/*ini Q-3 */}
           {answers.pengeluaran !== "" && (
-            <div 
-              ref={q3Ref} 
+            <div
+              ref={q3Ref}
               className="transition-all duration-700 ease-out opacity-100 transform translate-y-0"
             >
               <QuestionCard
                 type="chip-input"
                 question="Berapa total cicilan yang kamu bayar tiap bulan?"
                 options={["Tidak ada", "500 Rb", "1 Jt", "2 Jt", "3 Jt"]}
-                value={answers.cicilan}
                 onValueChange={(val) => handleChange("cicilan", val)}
               />
             </div>
           )}
 
-          {/* Pertanyaan 4 */}
+          {/*ini Q-4 */}
           {answers.cicilan !== "" && (
-            <div 
-              ref={q4Ref} 
+            <div
+              ref={q4Ref}
               className="transition-all duration-700 ease-out opacity-100 transform translate-y-0"
             >
               <QuestionCard
                 type="chip-input"
                 question="Berapa yang kamu sisihkan untuk ditabung tiap bulan?"
                 options={["100 Rb", "300 Rb", "500 Rb", "1 Jt", "2 Jt"]}
-                value={answers.tabungan}
                 onValueChange={(val) => handleChange("tabungan", val)}
               />
             </div>
           )}
 
-          {/* Pertanyaan 5 */}
+          {/*ini Q-5 */}
           {answers.tabungan !== "" && (
-            <div 
-              ref={q5Ref} 
-              className="transition-all duration-700 ease-out opacity-100 transform translate-y-0 mb-[-80]"
+            <div
+              ref={q5Ref}
+              className="transition-all duration-700 ease-out opacity-100 transform translate-y-0"
             >
               <QuestionCard
                 type="input"
                 question="Berapa total dana darurat / tabungan kas yang kamu punya sekarang?"
-                value={answers.danaDarurat}
                 onValueChange={(val) => handleChange("danaDarurat", val)}
               />
             </div>
           )}
-
         </div>
       </section>
 
-      {/* STICKY BOTTOM CAPSULE FLOATING STEPPER / BUTTON NEXT */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-40 px-3">
+      {/* STEPPER / BUTTON NEXT */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full px-4 flex justify-center">
         <div
-          className={`backdrop-blur-xl rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] flex items-center justify-center transition-all duration-300 ease-out h-7 border
-            ${isComplete
-              ? "bg-transparent border-[#82E2B3] hover:shadow-[0_0_15px_rgba(130,226,179,0.25)] hover:scale-[1.03] active:scale-[0.98]"
-              : "bg-black/40 border-white/10"
-            }`}
+          className={`backdrop-blur-xl rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.6)] flex items-center justify-center transition-all duration-300 ease-out h-10 border ${
+            isComplete
+              ? "bg-black/60 border-[#82E2B3] w-40 hover:shadow-[0_0_15px_rgba(130,226,179,0.25)] hover:scale-[1.03] active:scale-[0.98]"
+              : "bg-black/40 border-white/10 w-52"
+          }`}
         >
           {!isComplete ? (
-            <div className="flex gap-1.5 items-center justify-center w-full px-4">
+            <div className="flex gap-2 items-center justify-center w-full px-4">
               {[...Array(total)].map((_, i) => (
                 <div
                   key={i}
                   className={`h-1.5 rounded-full transition-all duration-500 ${
                     i < filled
-                      ? "bg-[#82E2B3] w-6 shadow-[0_0_6px_rgba(255,255,255,0.3)]"
-                      : "bg-white/15 w-4"
+                      ? "bg-[#82E2B3] w-6 shadow-[0_0_6px_rgba(130,226,179,0.5)]"
+                      : "bg-white/15 w-3"
                   }`}
                 />
               ))}
@@ -244,7 +230,7 @@ export default function QuestOne() {
           ) : (
             <button
               onClick={handleNext}
-              className="w-full h-full flex items-center justify-center text-[#82E2B3] hover:text-[#82E2B3] font-poppins text-xs font-medium tracking-wider transition-colors duration-200 cursor-pointer"
+              className="w-full h-full flex items-center justify-center text-[#82E2B3] font-poppins text-sm font-medium tracking-wider transition-colors duration-200 cursor-pointer"
             >
               next →
             </button>

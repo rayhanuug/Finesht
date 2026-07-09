@@ -1,15 +1,5 @@
-// ============================================================
-// calculateAHP.ts
-// Logika perhitungan AHP berdasarkan:
-// - Saaty, T.L. (1980) — The Analytic Hierarchy Process
-// - Saaty, T.L. (2008) — Decision making with the AHP
-// - Ishizaka & Labib (2011) — Review of the main developments in AHP
-// ============================================================
 
-// ──────────────────────────────────────────────
-// TIPE DATA
-// ──────────────────────────────────────────────
-
+// The DATA
 export type Kriteria = "return" | "risk" | "likuiditas" | "modal" | "timeHorizon";
 
 export type Alternatif =
@@ -25,7 +15,7 @@ export type Alternatif =
 export interface PairwiseAnswer {
   kriteria_a: Kriteria;
   kriteria_b: Kriteria;
-  nilai: number; // 1/5, 1/3, 1, 3, 5
+  nilai: number;
 }
 
 export interface AHPResult {
@@ -34,10 +24,6 @@ export interface AHPResult {
   cr: number;
   isConsistent: boolean;
 }
-
-// ──────────────────────────────────────────────
-// KONSTANTA
-// ──────────────────────────────────────────────
 
 export const KRITERIA_LIST: Kriteria[] = [
   "return",
