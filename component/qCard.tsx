@@ -1,20 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Props = {
   question: string;
   type: "input" | "radio" | "chip" | "chip-input" | "scale";
   options?: string[];
-  onValueChange?: (val: string) => void; // ← tambah ini
+  value?: string;                          // ← tambah ini
+  onValueChange?: (val: string) => void;
 };
 
 function convertToAngka(opt: string): string {
   const map: Record<string, string> = {
     "Tidak ada": "0",
     "100 Rb": "100000",
-    "500 Rb": "500000",
     "300 Rb": "300000",
+    "500 Rb": "500000",
     "1 Jt": "1000000",
     "2 Jt": "2000000",
     "3 Jt": "3000000",
@@ -59,12 +60,19 @@ function ChipOptions({
 
 function RadioOptions({
   options,
+  value,
   onValueChange,
 }: {
   options: string[];
+  value?: string;
   onValueChange?: (val: string) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(value ?? null);
+
+  useEffect(() => {
+    setSelected(value ?? null);
+  }, [value]);
+
   return (
     <div className="flex flex-col gap-3 mt-1">
       {options.map((opt) => (
@@ -102,6 +110,7 @@ function InputRp({
   onChange: (val: string) => void;
 }) {
   const isFocused = value !== "";
+
   function formatDisplay(val: string): string {
     if (!val) return "";
     const num = val.replace(/\D/g, "");
@@ -134,12 +143,19 @@ function InputRp({
 
 function ScaleOptions({
   options,
+  value,
   onValueChange,
 }: {
   options: string[];
+  value?: string;
   onValueChange?: (val: string) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(value ?? null);
+
+  useEffect(() => {
+    setSelected(value ?? null);
+  }, [value]);
+
   return (
     <div className="flex gap-2">
       {options.map((opt) => (
@@ -164,24 +180,41 @@ function ScaleOptions({
 
 function ChipWithInput({
   options,
+  value,
   onValueChange,
 }: {
   options: string[];
+  value?: string;
   onValueChange?: (val: string) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState("");
+  const matchedChip = options.find((opt) => convertToAngka(opt) === value) ?? null;
+  const [selected, setSelected] = useState<string | null>(matchedChip);
+  const [inputValue, setInputValue] = useState(value ?? "");
+
+  // Hanya sync dari luar kalau value berubah dari parent (restore localStorage)
+  // bukan dari user ngetik
+  const prevValue = useRef(value);
+  useEffect(() => {
+    if (prevValue.current !== value) {
+      prevValue.current = value;
+      const matched = options.find((opt) => convertToAngka(opt) === value) ?? null;
+      setSelected(matched);
+      setInputValue(value ?? "");
+    }
+  }, [value, options]);
 
   function handleChipSelect(opt: string) {
     setSelected(opt);
     const angka = convertToAngka(opt);
     setInputValue(angka);
-    onValueChange?.(angka); 
+    onValueChange?.(angka);
   }
 
   function handleInputChange(val: string) {
     setInputValue(val);
-    onValueChange?.(val); 
+    const matched = options.find((opt) => convertToAngka(opt) === val) ?? null;
+    setSelected(matched);
+    onValueChange?.(val);
   }
 
   return (
@@ -193,21 +226,27 @@ function ChipWithInput({
 }
 
 function StandaloneInput({
+  value,
   onValueChange,
 }: {
+  value?: string;
   onValueChange?: (val: string) => void;
 }) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(value ?? "");
+
+  useEffect(() => {
+    setInputValue(value ?? "");
+  }, [value]);
 
   function handleChange(val: string) {
     setInputValue(val);
-    onValueChange?.(val); // ← kirim ke parent
+    onValueChange?.(val);
   }
 
   return <InputRp value={inputValue} onChange={handleChange} />;
 }
 
-export default function QuestionCard({ question, type, options = [], onValueChange }: Props) {
+export default function QuestionCard({ question, type, options = [], value = "", onValueChange }: Props) {
   return (
     <div
       className="rounded-2xl border border-white/20 p-5 flex flex-col gap-4 w-full"
@@ -222,12 +261,12 @@ export default function QuestionCard({ question, type, options = [], onValueChan
       </p>
 
       {type === "chip" && (
-        <ChipOptions options={options} selected={null} onSelect={(val) => onValueChange?.(val)} />
+        <ChipOptions options={options} selected={value || null} onSelect={(val) => onValueChange?.(val)} />
       )}
-      {type === "chip-input" && <ChipWithInput options={options} onValueChange={onValueChange} />}
-      {type === "radio" && <RadioOptions options={options} onValueChange={onValueChange} />}
-      {type === "input" && <StandaloneInput onValueChange={onValueChange} />}
-      {type === "scale" && <ScaleOptions options={options} onValueChange={onValueChange} />}
+      {type === "chip-input" && <ChipWithInput options={options} value={value} onValueChange={onValueChange} />}
+      {type === "radio" && <RadioOptions options={options} value={value} onValueChange={onValueChange} />}
+      {type === "input" && <StandaloneInput value={value} onValueChange={onValueChange} />}
+      {type === "scale" && <ScaleOptions options={options} value={value} onValueChange={onValueChange} />}
     </div>
   );
 }

@@ -65,6 +65,13 @@ export default function Hasil() {
     match: Math.round(item.skor * 100),
   }));
 
+  // cek kosisten
+  console.log("Status Konsistensi AHP:", {
+  isConsistent: ahpResult.isConsistent,
+  cr: ahpResult.cr,
+  typeOfCr: typeof ahpResult.cr
+});
+
   return (
     <main className="min-h-screen bg-black relative overflow-hidden">
       <div

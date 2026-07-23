@@ -30,7 +30,7 @@ export default function ProgressBar(props: Props) {
       {/* Label */}
       <div className="flex justify-between items-center">
         <span className="text-white/50 font-poppins text-xs">
-          {isPercent ? "Total Kriteria" : "Progress"}
+          {isPercent ? "Total Kriteria" : ""}
         </span>
         <span
           className={`font-poppins text-xs font-medium transition-colors duration-300 ${
@@ -45,7 +45,7 @@ export default function ProgressBar(props: Props) {
         >
           {isPercent
             ? `${props.total}%`
-            : `${props.current}/${props.total}`}
+            : ``}
         </span>
       </div>
 

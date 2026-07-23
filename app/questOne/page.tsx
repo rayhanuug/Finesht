@@ -140,6 +140,7 @@ export default function QuestOne() {
               type="chip-input"
               question="Berapa penghasilan bulananmu?"
               options={["3 Jt", "5 Jt", "7 Jt", "10 Jt", "15 Jt"]}
+              value={answers.income}
               onValueChange={(val) => handleChange("income", val)}
             />
           </div>
@@ -154,6 +155,7 @@ export default function QuestOne() {
                 type="chip-input"
                 question="Berapa total pengeluaran rutinmu dalam sebulan?"
                 options={["1 Jt", "2 Jt", "3 Jt", "5 Jt", "7 Jt"]}
+                value={answers.pengeluaran}
                 onValueChange={(val) => handleChange("pengeluaran", val)}
               />
             </div>
@@ -169,6 +171,7 @@ export default function QuestOne() {
                 type="chip-input"
                 question="Berapa total cicilan yang kamu bayar tiap bulan?"
                 options={["Tidak ada", "500 Rb", "1 Jt", "2 Jt", "3 Jt"]}
+                value={answers.cicilan}
                 onValueChange={(val) => handleChange("cicilan", val)}
               />
             </div>
@@ -184,6 +187,7 @@ export default function QuestOne() {
                 type="chip-input"
                 question="Berapa yang kamu sisihkan untuk ditabung tiap bulan?"
                 options={["100 Rb", "300 Rb", "500 Rb", "1 Jt", "2 Jt"]}
+                value={answers.tabungan}
                 onValueChange={(val) => handleChange("tabungan", val)}
               />
             </div>
@@ -198,6 +202,7 @@ export default function QuestOne() {
               <QuestionCard
                 type="input"
                 question="Berapa total dana darurat / tabungan kas yang kamu punya sekarang?"
+                value={answers.danaDarurat}
                 onValueChange={(val) => handleChange("danaDarurat", val)}
               />
             </div>

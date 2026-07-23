@@ -201,7 +201,7 @@ function calculateRanking(
 export function calculateAHP(
   answers: PairwiseAnswer[],
   altScores: Record<Alternatif, Record<Kriteria, number>>
-): AHPResult {
+  ): AHPResult {
   // 1. Bangun matriks
   const matrix = buildMatrix(answers);
 
